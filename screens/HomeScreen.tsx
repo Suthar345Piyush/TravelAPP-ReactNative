@@ -5,6 +5,7 @@ import { useNavigation } from 'react-router-dom';
 import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 import FeaturedGuides from '../components/FeaturedGuides';
 import PopularDestinations from '../components/PopularDestinations';
+import WeekendTrips from '../components/WeekendTrips';
 
 
 // parameter list of the home stack 
@@ -73,6 +74,15 @@ const HomeScreen = () => {
             </Text>
             <FeaturedGuides/>
          </View>
+
+
+         <View className="p-4">
+            <Text className="text-2xl font-semibold mb-4">
+                Weekend Trips to Explore
+            </Text>
+            <WeekendTrips />
+         </View>
+
 
          <View className="p-4">
             <Text className="text-2xl font-semibold mb-4">
