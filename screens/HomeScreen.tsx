@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from 'react-router-dom';
 import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 import FeaturedGuides from '../components/FeaturedGuides';
+import PopularDestinations from '../components/PopularDestinations';
 
 
 // parameter list of the home stack 
@@ -71,6 +72,13 @@ const HomeScreen = () => {
                 Featured Guides from users
             </Text>
             <FeaturedGuides/>
+         </View>
+
+         <View className="p-4">
+            <Text className="text-2xl font-semibold mb-4">
+                Explore Popular destinations
+            </Text>
+            <PopularDestinations/>
          </View>
        </ScrollView>
      </SafeAreaView>
