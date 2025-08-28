@@ -1,6 +1,7 @@
-import { ImageBackground, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, ImageBackground, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
+import {Ionicons} from "@expo/vector-icons";
 
 
 const places = [
@@ -101,21 +102,51 @@ const GuideScreen = () => {
        <Text className="text-black text-sm font-medium line-clamp-2">
      {place.description}
        </Text>
-       
      </View>
+   </ImageBackground>
 
-          </ImageBackground>
+    {/* attributes section  */}
+   <View className="p-4 bg-white">
+     <View className="flex-row item-center mb-2">
+        <Ionicons name="location-outline" size={16} color="#FF5722"/>
+        <Text className="text-gray-800 text-sm font-medium ml-2">
+          {place.attributes.location}
+        </Text>
+     </View>
+     <View className="flex-row items-center mb-2">
+       <Ionicons name="map-outline" size={16} color="#FF5722"/>
+       <Text className="text-gray-800 text-sm font-medium ml-2">
+         Type: {place.attributes.type}
+       </Text>
+     </View>
+    <View className="">
+    <Ionicons name="calendar-outline" size={16} color="#FF5722"/>
+    <Text className="text-gray-800 text-sm font-medium ml-2">Best time: {place.attributes.bestTime}</Text>
+    </View>
 
-         </Pressable>
-      ))}
+    <View>
+      <Ionicons name="star-outline" size={16} color="#FF5722"/>
+       <Text className="">Attractions: {place.attributes.attractions.join(', ')}</Text>
+              </View>
+            </View>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+   );
+};
+
+const styles = StyleSheet.create({
+   card : {
+      height : Dimensions.get('window').height*0.5,    // 50% of screen height 
+      marginBottom : 16,
+   },
+   image : {
+     height : '60%'   // image taking 60% of card height
+   },
+});
+
+export default GuideScreen;
 
 
-
-
-       </ScrollView>
-     </SafeAreaView>
-  )
-}
-
-export default GuideScreen
 
