@@ -1,8 +1,9 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ImageBackground, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 
-const placess = [
+const places = [
   {
     id: "1",
     name: "Mysore Palace",
@@ -71,14 +72,46 @@ const placess = [
 ];
 
 const GuideScreen = () => {
+   const navigation = useNavigation<GuideNavigationProp>();
   return (
-     <SafeAreaView>
-       <ScrollView>
-         <View>
-           <Text>
-             Explore Karnataka
-           </Text>
+     <SafeAreaView className="flex-1 bg-white">
+       <ScrollView className="flex-1" contentContainerStyle={{paddingBottom : 100}} showsVerticalScrollIndicator={false}>
+            {/* header  */}
+         <View className="px-4 py-4 border-b border-gray-200">
+           <Text className="text-2xl font-bold text-gray-800">Explore Karnataka</Text>
+           <Text className="text-sm font-medium text-gray-700 mt-1">Discover the best places to visit in karnataka</Text>
          </View>
+
+         {/* places cards of diff , location  */}
+      
+      {places.map((place) => (
+         <Pressable key={place.id} onPress={() => navigation.navigate('GuideDetail' , {place})} className='mx-4 mt-4 rounded-xl overflow-hidden shadow-sm' style={styles.card}>
+
+          <ImageBackground source={{uri : place.image}}
+           className='w-full h-full'
+            style={styles.image}>
+           
+           <View className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+          
+          {/* places name , description */}
+     <View className="p-4 flex-1 justify-end">
+       <Text className="text-black text-xl font-bold mb-2">
+       {place.name}
+       </Text>
+       <Text className="text-black text-sm font-medium line-clamp-2">
+     {place.description}
+       </Text>
+       
+     </View>
+
+          </ImageBackground>
+
+         </Pressable>
+      ))}
+
+
+
+
        </ScrollView>
      </SafeAreaView>
   )
