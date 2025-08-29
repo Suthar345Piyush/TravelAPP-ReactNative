@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, Text, View , Image, TouchableOpacity  } from 
 import React from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
-import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
+import { ScrollView } from 'react-native';
 import FeaturedGuides from '../components/FeaturedGuides';
 import PopularDestinations from '../components/PopularDestinations';
 import WeekendTrips from '../components/WeekendTrips';

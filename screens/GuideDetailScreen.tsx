@@ -1,6 +1,8 @@
 import { RouteProp } from '@react-navigation/native'
-import { StyleSheet, Text, View } from 'react-native'
+import { ImageBackground, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { GuideStackParamList } from '../navigation/GuideStack'
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {Ionicons} from "@expo/vector-icons";
 
 
 type GuideDetailScreenRouteProp = RouteProp<GuideStackParamList , 'GuideDetail'>;
@@ -81,9 +83,60 @@ const GuideDetailScreen = ({route , navigation}:Props) => {
    const extraAttributes = additionalAttributes[place.name] || {entryFee:"N/A" , travelTips:[]};
    
   return (
-    <View>
-      <Text>GuideDetailScreen</Text>
+    <SafeAreaView className="flex-1 bg-white">
+       <ScrollView className="flex-1" contentContainerStyle={{paddingBottom : 100}}>
+          {/* image header  */}
+          <ImageBackground source={{uri : place.image}}
+           resizeMode='cover'
+            className="w-full h-80">
+
+              <View  className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"/>
+
+               {/* back button  */}
+               <TouchableOpacity className="" onPress={() => navigation.goBack()}>
+
+                 <Ionicons name="arrow-back" size={23} color="#FF5722"/>
+               </TouchableOpacity>
+
+               {/* place info  */}
+
+               <View className="p-4 flex-1 justify-end">
+                 <Text className="text-white text-2xl font-bold">
+                  {place.name}
+                 </Text>
+               </View>
+          </ImageBackground>
+    
+    {/* detail section  */}
+    <View className="p-4">
+        <View className="mb-6">
+          <Text className="text-lg font-semibold text-gray-800 mb-2">About</Text>
+          <Text className="text-base font-medium text-gray-800">
+            {place.description}
+          </Text>
+        </View>
+
+        {/* attributes  */}
+
+        <View>
+          <Text className="text-lg font-semibold text-gray-800 mb-3">Details</Text>
+       <View>
+         <Ionicons name="location-outline" size={23} color="#FF5722"/> 
+            <Text className="">Location: {place.attributes.location}</Text>
+       </View>
+       <View className="flex-row items-center mb-3">
+         <Ionicons name="map-outline" size={21} color="#FF5722"/>
+         <Text className="text-gray-800 text-base font-medium ml-3">Type: {place.attributes.type}</Text>
+       </View>
+
+       <View>
+         <Ionicons />
+       </View>
+        </View>
     </View>
+
+       </ScrollView>
+    </SafeAreaView>
   )
 }
 
