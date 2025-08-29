@@ -79,7 +79,7 @@ const additionalAttributes: {
 
 const GuideDetailScreen = ({route , navigation}:Props) => {
    const {place} = route?.params;
-   const iternary = itineraries[place.name] || [];
+   const itinerary = itineraries[place.name] || [];
    const extraAttributes = additionalAttributes[place.name] || {entryFee:"N/A" , travelTips:[]};
    
   return (
@@ -118,28 +118,67 @@ const GuideDetailScreen = ({route , navigation}:Props) => {
 
         {/* attributes  */}
 
-        <View>
+        <View className="border-t border-gray-200 pt-4 mb-4">
           <Text className="text-lg font-semibold text-gray-800 mb-3">Details</Text>
-       <View>
-         <Ionicons name="location-outline" size={23} color="#FF5722"/> 
+
+       <View className="flex-row items-center mb-3">
+             <Ionicons name="location-outline" size={23} color="#FF5722"/> 
             <Text className="">Location: {place.attributes.location}</Text>
        </View>
+
        <View className="flex-row items-center mb-3">
          <Ionicons name="map-outline" size={21} color="#FF5722"/>
          <Text className="text-gray-800 text-base font-medium ml-3">Type: {place.attributes.type}</Text>
        </View>
 
-       <View>
-         <Ionicons />
+       <View className="flex-row items-center mb-3">
+         <Ionicons name="calendar-outline" size={21} color="#FF5722"/>
+         <Text className="">Best Time: {place.attributes.bestTime}</Text>
        </View>
-        </View>
+
+       <View className="flex-row items-center mb-3">
+          <Ionicons name="star-outline" size={21} color="#FF5722"/>
+          <Text className="">Attractions: {place.attributes.attractions.join(', ')}</Text>
+       </View>
+       
+       <View className="flex-row items-center mb-3">
+       <Ionicons name="cash-outline" size={21} color="#FF5722"/>
+       <Text className="">Entry Fee: {extraAttributes.entryFee}</Text>
+       </View>
     </View>
 
+    {/* itinerary  */}
+
+    {itinerary.length > 0 && (
+       <View className="border-t border-gray-200 pt-4 mb-6">
+        <Text className="flex-row items-center mb-3">Suggested Itinerary</Text> 
+          {itinerary.map((item , index) => (
+          <View key={index}  className="flex-row items-start mb-2">
+       <Text className="text-gray-800 text-base font-medium mr-2">*</Text>
+       <Text className="text-gray-800 text-base font-medium flex-1">{item}</Text>
+          </View>
+        ))}
+       </View>
+    )}
+
+       {/* travel tips  */}
+    
+    {extraAttributes.travelTips.length > 0 && (
+       <View className="border-t border-gray-200 pt-4">
+         <Text className="text-lg font-semibold text-gray-800 mb-3">Travel Tips</Text>
+         {extraAttributes.travelTips.map((tip , index) => (
+           <View className="flex-row items-start mb-2" key={index}>
+            <Text className="text-gray-800 text-base font-medium mr-2">*</Text>
+            <Text className="text-gray-800 text-base font-medium flex-1">{tip}</Text>
+           </View>
+         ))}
+       </View>
+    )}
+  </View>
        </ScrollView>
     </SafeAreaView>
-  )
+  );
 }
 
-export default GuideDetailScreen
+export default GuideDetailScreen;
 
-const styles = StyleSheet.create({})
