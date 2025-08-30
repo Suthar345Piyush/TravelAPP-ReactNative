@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const mongoUri = "mongodb+srv://piyush:Piyush@cluster0.wabcbqp.mongodb.net/";
+const mongoUri = "mongodb+srv://piyush:<password>@cluster0.wabcbqp.mongodb.net/";
 mongoose.connect(mongoUri).then(() => {
    console.log("Connected to mongoDb")
 }).catch(err => {
