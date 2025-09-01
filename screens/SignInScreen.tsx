@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../navigation/RootNavigator";
 import React , {useState} from "react";
 import GoogleSignIn from "../components/GoogleSignIn";
-import { KeyboardReturnOutlined } from "@mui/icons-material";
+
 
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -57,6 +57,7 @@ export default function SignInScreen() {
             <Text style={[styles.linkText , {color: "FF5722"}]}>Sign-Up</Text>
            </TouchableOpacity>
          </View>
+         
          <GoogleSignIn />
        </View>
     );
