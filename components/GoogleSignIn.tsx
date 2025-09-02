@@ -1,11 +1,13 @@
 import {useSSO} from "@clerk/clerk-expo";
 import * as WebBrowser from "expo-web-browser";
 import * as Linking from "expo-linking";
+import * as AuthSession from "expo-auth-session";
 import {View , Text , TouchableOpacity , Image , ActivityIndicator} from "react-native";
-
 import React , {useCallback , useEffect , useState} from "react";
 
-const useWarmUpBrowser = () => {
+
+
+export const useWarmUpBrowser = () => {
     useEffect(() => {
         void WebBrowser.warmUpAsync();
        return () => {
@@ -15,20 +17,27 @@ const useWarmUpBrowser = () => {
 };
 
 
+// handle any pending authentication session 
+
+WebBrowser.maybeCompleteAuthSession();
+
+
+
 export default function GoogleSignIn() {
-   const {startSSOFlow} = useSSO({strategy : "_google"});
+     useWarmUpBrowser();
+
+   const {startSSOFlow} = useSSO();
    const [loading  , setLoading] = useState(false);
    const [error , setError] = useState("");
 
-   useWarmUpBrowser();
+   
 
    const onGoogleSignInPress = useCallback(async () => {
       setLoading(true);
       setError("");
 
       try{
-            const {createdSessionId , signIn , signUp ,  setActive} = await startSSOFlow({redirectUrl : Linking.createURL("/"),
-            });
+            const {createdSessionId , signIn , signUp ,  setActive} = await startSSOFlow({ strategy : 'oauth_google' , redirectUrl : AuthSession.makeRedirectUri()});
 
             if(createdSessionId){
                await setActive!({session : createdSessionId});
