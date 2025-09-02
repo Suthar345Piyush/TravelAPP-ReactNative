@@ -6,7 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import dayjs from 'dayjs';
 
 
-
 const NewTripScreen = () => {
    const [calendarVisible , setCalendarVisible] = useState(false);
 
@@ -25,7 +24,7 @@ const NewTripScreen = () => {
    const today = dayjs().format("YYYY-MM-DD");
 
 
-   
+
   return (
     <SafeAreaView className="flex-1 bg-white px-5">
      <View className="mt-2 mb-4">
@@ -45,19 +44,25 @@ const NewTripScreen = () => {
      </TouchableOpacity>
 
 
-     <TouchableOpacity>
-      <View>
-        <Text>Dates (optional)</Text>
-        <View>
-           <Ionicons name="calendar" color={"#000"} size={28}/>
-           <Text>
+     <TouchableOpacity className="flex-row border border-gray-300 rounded-xl px-4 py-3 justify-between mb-4">
+      <View className="flex-1 mr-2"> 
+        <Text className="text-sm font-semibold text-gray-700 mb-1">Dates (optional)</Text>
+        <View className="flex-row items-center">
+           <Ionicons name="calendar" color={"#000"} size={17} className="mr-1"/>
+           <Text className="text-sm text-gray-500">
              {displayStart ? dayjs(displayStart).format("MMM D") : "Start Date"}
            </Text> 
           </View>  
        </View>  
+
+       <View>
+         <Text className="text-sm font-semibold text-gray-700 mb-1 invisible">*</Text>
+           <View>
+             <Ionicons name="calendar" color="#666" className="mr-1" size={17}/>
+             <Text className="text-sm text-gray-500">{displayEnd ? dayjs(displayEnd).format("MMM D") : "End Date"}</Text>
+           </View>
+       </View>
      </TouchableOpacity>
-
-
     </SafeAreaView>
   )
 };
