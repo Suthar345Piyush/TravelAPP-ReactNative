@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
+import NewTripScreen from "../screens/NewTripScreen";
 
 
 //defining the home stack param list 
@@ -18,6 +19,7 @@ const HomeStack = () => {
   return (
     <Stack.Navigator screenOptions={{headerShown : false}}>
        <Stack.Screen name="HomeMain" component={HomeScreen}/>
+       <Stack.Screen name="NewTrip" component={NewTripScreen}/>
     </Stack.Navigator>
   )
 }

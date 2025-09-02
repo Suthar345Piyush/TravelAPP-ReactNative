@@ -1,14 +1,25 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {Text , View , SafeAreaView , StyleSheet ,Pressable} from "react-native";
+import React from "react";
+import { useClerk } from "@clerk/clerk-expo";
 
 const ProfileScreen = () => {
-  return (
-    <View>
-      <Text>ProfileScreen</Text>
-    </View>
-  )
-}
+    const {signOut} = useClerk();
+    const handleSignout = async () => {
+        try {
+          await signOut();
+        } catch (err) {
+          console.log("Error" , err);
+        }
+    }
 
-export default ProfileScreen
+    return (
+       <SafeAreaView>
+         <Text>ProfileScreen</Text>
+         <Pressable onPress={handleSignout}>
+           <Text>Logout</Text>
+         </Pressable>
+       </SafeAreaView>
+    );
+};
 
-const styles = StyleSheet.create({})
+

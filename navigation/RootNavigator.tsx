@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
 import SignInScreen from '../screens/SignInScreen';
 import SignUpScreen from '../screens/SignUpScreen';
+import { useAuth } from '@clerk/clerk-expo';
 
 
 export type RootStackParamList = {
@@ -17,7 +18,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 
 export default function RootNavigator(){
-    // const {isLoaded , isSignedIn}  = useAuth();
+    const {isLoaded , isSignedIn}  = useAuth();
 
     // loading till the clerk authentication , working... 
 
