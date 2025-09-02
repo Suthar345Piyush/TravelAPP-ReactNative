@@ -14,7 +14,7 @@ export default function SignUpScreen() {
    const navigation = useNavigation<NavigationProp>();
    const [emailAddress , setEmailAddress] = useState("");
    const [password , setPassword] = useState("");
-   const [pendingVerification , setPendingVerification] = useState("");
+   const [pendingVerification , setPendingVerification] = useState<boolean>(false);
    const [code , setCode] = useState("");
    const [error , setError]  = useState("");
 
