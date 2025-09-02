@@ -7,16 +7,16 @@ import React , {useCallback , useEffect , useState} from "react";
 
 const useWarmUpBrowser = () => {
     useEffect(() => {
-       void WebBrowser.warmUpAsync();
+        void WebBrowser.warmUpAsync();
        return () => {
-         void WebBrowser.coolDownAsync();
+        void WebBrowser.coolDownAsync();
        }
     } , []);
 };
 
 
 export default function GoogleSignIn() {
-   const {startSSOFlow} = useSSO({strategy : "oauth_google"});
+   const {startSSOFlow} = useSSO({strategy : "_google"});
    const [loading  , setLoading] = useState(false);
    const [error , setError] = useState("");
 
@@ -27,8 +27,7 @@ export default function GoogleSignIn() {
       setError("");
 
       try{
-            const {createdSessionId , setActive} = await startSSOFlow({
-              redirectUrl : Linking.createURL("/");
+            const {createdSessionId , signIn , signUp ,  setActive} = await startSSOFlow({redirectUrl : Linking.createURL("/"),
             });
 
             if(createdSessionId){
