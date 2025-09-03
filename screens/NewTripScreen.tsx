@@ -9,7 +9,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth , useUser } from '@clerk/clerk-expo';
 import {useTrip} from "../context/TripContext";
-import {GooglePlacesAutoComplete} from "react-native-google-places-autocomplete";
+import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete";
+import { Details } from '@mui/icons-material';
 
 
 
@@ -199,10 +200,47 @@ const NewTripScreen = () => {
 
 
         {/* google places auto complete - to access google maps location on react native using a library  */}
-   <GooglePlacesAutoComplete />
+   <GooglePlacesAutocomplete 
+    placeholder="Search for a place"
+     fetchDetails={true}
+      enablePoweredByContainer={false}
+       onPress={(data , details = null) => {
+          if(data?.description){
+             setChosenLocation(data.description);
+          }
+          setSearchVisible(false);
+       }}
+       query={{
+         key : GOOGLE_API_KEY,
+         language : "en"
+       }}
+       styles={{
+         container : {
+          flex : 0,
+         },
+         textInputContainer : {
+           flexDirection : "row",
+           backgroundColor : "#f1f1f1",
+           borderRadius : 30,
+           paddingHorizontal : 10,
+           alignItems : "center",
+         },
+          
+         textInput : {
+           flex : 1,
+           height : 44,
+           color : "#333",
+           fontSize : 16,
+           backgroundColor : 10,
+           borderRadius : 25,
+         },
 
-
-
+         listView : {
+           marginTop : 10,
+           backgroundColor : "#fff",
+         },
+       }}
+        />
        </SafeAreaView>
      </Modal>
     </SafeAreaView>
