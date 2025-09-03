@@ -10,7 +10,7 @@ import { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth , useUser } from '@clerk/clerk-expo';
 import {useTrip} from "../context/TripContext";
 import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete";
-import { Details } from '@mui/icons-material';
+
 
 
 
@@ -50,7 +50,7 @@ const NewTripScreen = () => {
    const today = dayjs().format("YYYY-MM-DD");
 
 
-   const handleDayPress = (day) => {
+   const handleDayPress = (day : any) => {
       const selected = day.dateString;
 
 
@@ -166,6 +166,10 @@ const NewTripScreen = () => {
      {error && (
        <Text className='text-red-500 text-sm mb-4'>{error}</Text>
      )} 
+
+     <TouchableOpacity className="bg-orange-500 rounded-full py-3 items-center mb-4">
+       <Text className='text-white font-semibold text-base'>Start Planning</Text>
+     </TouchableOpacity>
 
      <Text className='text-sm text-gray-500 text-center'>
        Or see an example for <Text className="font-semibold text-gray-600">NewYork</Text>
