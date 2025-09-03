@@ -4,11 +4,14 @@ import {Ionicons} from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import dayjs from 'dayjs';
-import {Calendar , DateObject} from "react-native-calendars";
+import {Calendar } from "react-native-calendars";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth , useUser } from '@clerk/clerk-expo';
 import {useTrip} from "../context/TripContext";
+import {GooglePlacesAutoComplete} from "react-native-google-places-autocomplete";
+
+
 
  
 
@@ -25,7 +28,7 @@ const NewTripScreen = () => {
 
    const [displayEnd , setDisplayEnd] = useState<string>("");
 
-   const [searchVisible , setSearchVisible] = useState("");
+   const [searchVisible , setSearchVisible] = useState(false);
 
    const [chosenLocation , setChosenLocation] = useState<string | null>("");
 
@@ -46,7 +49,7 @@ const NewTripScreen = () => {
    const today = dayjs().format("YYYY-MM-DD");
 
 
-   const handleDayPress = (day : DateObject) => {
+   const handleDayPress = (day) => {
       const selected = day.dateString;
 
 
@@ -97,20 +100,15 @@ const NewTripScreen = () => {
 
 
     // date saving function 
-    
+
     const onSaveDates = () => {
        if(selectedRange.startDate) setDisplayStart(selectedRange.startDate);
        if(selectedRange.endDate) setDisplayEnd(selectedRange.endDate);
        setCalendarVisible(false);
     };
 
-
-
-
-
-
-
-
+    console.log("data" , calendarVisible);
+    GOOGLE_API_KEY = 
 
 
   return (
@@ -124,7 +122,7 @@ const NewTripScreen = () => {
      <Text className="text-2xl font-bold text-gray-900 mb-1">Plan a new Trip</Text>
      <Text className="text-base text-gray-500 mb-6">Build an itinerary and map for your upcoming travel plans</Text>
 
-     <TouchableOpacity className="border border-gray-300 rounded-xl px-4 py-3 mb-4">
+     <TouchableOpacity onPress={() => setSearchVisible(true)} className="border border-gray-300 rounded-xl px-4 py-3 mb-4">
        <Text className="text-sm font-semibold text-gray-700 mb-1">Where to?</Text>
 
       <Text className="text-base text-gray-500">{chosenLocation || "E.g: Paris , Hawaii , Japan"}</Text>
@@ -132,7 +130,7 @@ const NewTripScreen = () => {
      </TouchableOpacity>
 
 
-     <TouchableOpacity className="flex-row border border-gray-300 rounded-xl px-4 py-3 justify-between mb-4">
+     <TouchableOpacity onPress={() => setCalendarVisible(true)} className="flex-row border border-gray-300 rounded-xl px-4 py-3 justify-between mb-4">
       <View className="flex-1 mr-2"> 
         <Text className="text-sm font-semibold text-gray-700 mb-1">Dates (optional)</Text>
         <View className="flex-row items-center">
@@ -172,9 +170,9 @@ const NewTripScreen = () => {
        Or see an example for <Text className="font-semibold text-gray-600">NewYork</Text>
      </Text>
 
-     <Modal>
-       <View>
-         <View>
+     <Modal animationType='slide' transparent visible={calendarVisible}>
+       <View className="flex-1 justify-center items-center bg-black/60">
+         <View className="bg-white rounded-2xl w-11/12">
             <Calendar 
              markingType='period'
               markedDates={getMarkedDates()}
@@ -187,6 +185,25 @@ const NewTripScreen = () => {
                }}/>
          </View>
        </View>
+     </Modal>
+
+
+     <Modal animationType='fade' visible={searchVisible}>
+       <SafeAreaView className='flex-1 ng-white pt-10 px-4'>
+        <View className="flex-row items-center mb-4">
+           <TouchableOpacity>
+             <Ionicons name="arrow-back" size={24} color="#000"/>
+           </TouchableOpacity>
+           <Text className="text-lg font-semibold text-gray-900">Search for a place</Text>
+        </View>
+
+
+        {/* google places auto complete - to access google maps location on react native using a library  */}
+   <GooglePlacesAutoComplete />
+
+
+
+       </SafeAreaView>
      </Modal>
     </SafeAreaView>
   )
