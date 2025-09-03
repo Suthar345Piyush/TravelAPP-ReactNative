@@ -1,9 +1,16 @@
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import {Ionicons} from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import dayjs from 'dayjs';
+import {Calendar , DateObject} from "react-native-calendars";
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/RootNavigator';
+import { useAuth , useUser } from '@clerk/clerk-expo';
+import {useTrip} from "../context/TripContext";
+
+ 
 
 
 const NewTripScreen = () => {
@@ -14,14 +21,95 @@ const NewTripScreen = () => {
       endDate?:string;
    }>({});
 
-   const [displayStart , setDisplayStart] = useState("");
-   const [displayEnd , setDisplayEnd] = useState("");
+   const [displayStart , setDisplayStart] = useState<string>("");
+
+   const [displayEnd , setDisplayEnd] = useState<string>("");
+
    const [searchVisible , setSearchVisible] = useState("");
-   const [chosenLocation , setChosenLocation] = useState("");
-   const navigation = useNavigation();
+
+   const [chosenLocation , setChosenLocation] = useState<string | null>("");
+
+   const [isLoading , setIsLoading] = useState(false);
+
+
+   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+   const {addTrip} = useTrip();
+
+   const [error , setError] = useState<string | null>("");
+   
+   const {getToken} = useAuth();
+
+   const {user} = useUser();
 
 
    const today = dayjs().format("YYYY-MM-DD");
+
+
+   const handleDayPress = (day : DateObject) => {
+      const selected = day.dateString;
+
+
+      if(
+         !selectedRange.startDate || (selectedRange.startDate && selectedRange.endDate)
+      ) {
+         setSelectedRange({startDate : selected});
+      } else if(
+         selectedRange.startDate && dayjs(selected).isAfter(selectedRange.startDate)
+      ) {
+         setSelectedRange({
+           ...selectedRange,
+           endDate : selected,
+         })
+      }
+   };
+
+
+   const getMarkedDates = () => {
+      const marks : any = {};
+
+      const {startDate , endDate} = selectedRange;
+      if(startDate && !endDate) {
+         marks[startDate] = {
+           startingDay : true,
+           endingDay : true,
+           color : "#FF5722",
+           textColor : "white",
+         };
+      }  else if(startDate && endDate){
+         let curr = dayjs(startDate);
+         const end = dayjs(endDate);
+
+
+         while(curr.isBefore(end) || curr.isSame(end)){
+           const formatted = curr.format("YYYY-MM-DD");
+           marks[formatted] = {
+              color : "#FF5277",
+              textColor : "white",
+              ...(formatted === startDate && {startingDay : true}),
+              ...(formatted === endDate && {endingDay : true}),
+           };
+           curr = curr.add(1 , "day");
+         }
+      }
+      return marks;
+   };
+
+
+    // date saving function 
+    
+    const onSaveDates = () => {
+       if(selectedRange.startDate) setDisplayStart(selectedRange.startDate);
+       if(selectedRange.endDate) setDisplayEnd(selectedRange.endDate);
+       setCalendarVisible(false);
+    };
+
+
+
+
+
+
+
 
 
 
@@ -63,6 +151,43 @@ const NewTripScreen = () => {
            </View>
        </View>
      </TouchableOpacity>
+
+     <View className="flex-row justify-between items-center mb-8">
+       <TouchableOpacity>
+         <Text className="text-sm text-gray-600 font-medium">*Invite a tripmate</Text>
+       </TouchableOpacity>
+       <TouchableOpacity className="flex-row items-center">
+        <Ionicons name="people" size={16} color="#666"/>
+         <Text className="ml-1 text-sm text-gray-600 font-medium">Friends</Text>
+        <Ionicons name="chevron-down" size={16} color="#666"/>
+       </TouchableOpacity>
+     </View>
+
+
+     {error && (
+       <Text className='text-red-500 text-sm mb-4'>{error}</Text>
+     )} 
+
+     <Text className='text-sm text-gray-500 text-center'>
+       Or see an example for <Text className="font-semibold text-gray-600">NewYork</Text>
+     </Text>
+
+     <Modal>
+       <View>
+         <View>
+            <Calendar 
+             markingType='period'
+              markedDates={getMarkedDates()}
+               onDayPress={handleDayPress}
+               minDate={today}
+               theme = {{
+                 todayTextColor : "#FF5722",
+                 arrowColor : "#008FFF",
+                 selectedDayTextColor : "#fff"
+               }}/>
+         </View>
+       </View>
+     </Modal>
     </SafeAreaView>
   )
 };
