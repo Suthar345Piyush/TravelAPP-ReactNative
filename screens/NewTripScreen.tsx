@@ -1,4 +1,4 @@
-import { Modal, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Modal, Text, TouchableOpacity, View } from 'react-native';
 import React, { useState } from 'react';
 import {Ionicons} from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
@@ -161,6 +161,22 @@ const NewTripScreen = () => {
          },
        };
 
+       const response = await axios.post("http://localhost:3000/api/trips" , tripData , {
+         headers :  {
+           "Content-Type" : "application/json",
+           Authorization : `Bearer ${token}`,
+         }
+       });
+
+       const createdTrip = response.data.trip;
+       
+       addTrip(createdTrip);
+
+       navigation.navigate("PlanTrip" , {trip : createdTrip});
+
+
+       
+
        } catch(error : any){
          console.error("Error creating trip:", error);
          setError(error.reponse?.data?.error || "Failed to create trip");
@@ -226,7 +242,17 @@ const NewTripScreen = () => {
      )} 
 
      <TouchableOpacity onPress={handleCreateTrip} className="bg-orange-500 rounded-full py-3 items-center mb-4">
-       <Text className='text-white font-semibold text-base'>Start Planning</Text>
+
+      {isLoading ? (
+           <ActivityIndicator size={"small"} color="#fff"/>
+             
+
+
+
+      ) : (
+        <Text className='text-white font-semibold text-base'>Start Planning</Text>
+      )}
+       
      </TouchableOpacity>
 
      <Text className='text-sm text-gray-500 text-center'>

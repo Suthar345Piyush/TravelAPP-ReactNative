@@ -3,6 +3,7 @@ import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
 import NewTripScreen from "../screens/NewTripScreen";
+import PlanTripScreen from '../screens/PlanTripScreen';
 
 
 //defining the home stack param list 
@@ -20,6 +21,7 @@ const HomeStack = () => {
     <Stack.Navigator screenOptions={{headerShown : false}}>
        <Stack.Screen name="HomeMain" component={HomeScreen}/>
        <Stack.Screen name="NewTrip" component={NewTripScreen}/>
+       <Stack.Screen name="PlanTrip" component={PlanTripScreen}/>
     </Stack.Navigator>
   )
 }

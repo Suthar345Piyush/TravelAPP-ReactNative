@@ -63,13 +63,13 @@ app.post("/api/trips" , async(req , res) => {
           return res.status(400).json({error : "Missing required trip fields"});
        };
 
-       let user = await User.find({clerkUserId});
+       let user = await User.findOne({clerkUserId});
        if(!user){
           const {email , name} = userData;
           if(!email){
              return res.status(400).json({error : "User email id required"});
           }
-          user = new User({clerkUserId , user , name});
+          user = new User({clerkUserId , email , name});
           await user.save();
        }
 
