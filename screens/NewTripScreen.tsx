@@ -8,13 +8,10 @@ import {Calendar } from "react-native-calendars";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { useAuth , useUser } from '@clerk/clerk-expo';
-import {useTrip} from "../context/TripContext";
+// import {useTrip} from "../context/TripContext";
 import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete";
+import axios from 'axios';
 
-
-
-
- 
 
 
 const NewTripScreen = () => {
@@ -108,8 +105,69 @@ const NewTripScreen = () => {
        setCalendarVisible(false);
     };
 
-    console.log("data" , calendarVisible);
-    GOOGLE_API_KEY = 
+   const handleCreateTrip = async() => {
+       try {
+          setIsLoading(true);
+          setError(null);
+
+          if(!chosenLocation || !selectedRange.startDate || !selectedRange.endDate){
+             setError("Please select the location and range of dates");
+             return;
+          }
+
+          const clerkUserId  = user?.id 
+          const email = user?.primaryEmailAddress?.emailAddress;
+          
+          if(!clerkUserId || !email){
+             setError("User is not authenticated or email is missing");
+             return;
+          }
+
+          // background photo of the place 
+
+          let background = "https://via.placeholder.com/150";
+          try {
+            const findPlaceUrl  = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+              chosenLocation
+            )}&inputype=textquery&fields=place_id,photos&key=${GOOGLE_API_KEY}`;
+            const findPlaceRes = await axios.get(findPlaceUrl);
+            const placeId = findPlaceRes.data.candidates?.[0]?.place_id;
+
+            if(placeId){
+               const detailsUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=photos&key=${GOOGLE_API_KEY}`;
+               const detailsRes = await axios.get(detailsUrl);
+               const photos = detailsRes.data.result?.photos;
+               if(photos?.length > 0){
+                 background = `https://maps.googleapi.com/maps/api/place/photo?maxwidth=800&photoreference=${photos[0].photo_reference}&key=${GOOGLE_API_KEY}`;
+               }
+            }
+          }catch(photoError){
+             console.warn("Error fetching place photo" , photoError);
+          }
+
+       // data about the trip
+
+       const tripData = {
+         tripName : chosenLocation,
+         startDate : selectedRange.startDate,
+         endDate : selectedRange.endDate,
+         startDay : dayjs(selectedRange.startDate).format("dddd"),
+         endDay : dayjs(selectedRange.endDate).format("dddd"),
+         background,
+         clerkUserId,
+         userDate : {
+           email,
+           name : user?.fullName || "",
+         },
+       };
+
+       } catch(error : any){
+         console.error("Error creating trip:", error);
+         setError(error.reponse?.data?.error || "Failed to create trip");
+       } finally {
+         setIsLoading(false); 
+       }
+   };
 
 
   return (
@@ -167,7 +225,7 @@ const NewTripScreen = () => {
        <Text className='text-red-500 text-sm mb-4'>{error}</Text>
      )} 
 
-     <TouchableOpacity className="bg-orange-500 rounded-full py-3 items-center mb-4">
+     <TouchableOpacity onPress={handleCreateTrip} className="bg-orange-500 rounded-full py-3 items-center mb-4">
        <Text className='text-white font-semibold text-base'>Start Planning</Text>
      </TouchableOpacity>
 

@@ -120,7 +120,7 @@ app.get("/" , async(req , res) => {
         }).populate("host travelers")
 
 
-        res.status(201).json({trips});
+        res.status(200).json({trips});  
 
 
     } catch(error){
