@@ -1,4 +1,4 @@
-import {Text , View , SafeAreaView , StyleSheet ,Pressable, ScrollView, Image, TouchableOpacity} from "react-native";
+import {Text , View , SafeAreaView  , Pressable, ScrollView, Image, TouchableOpacity} from "react-native";
 import React, {useCallback, useState} from "react";
 import { useClerk, useUser } from "@clerk/clerk-expo";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -6,7 +6,7 @@ import { HomeStackParamList } from "./HomeScreen";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import dayjs from "dayjs";
-import {Ionicons} from "@expo/vector-icons";
+import {Entypo, Ionicons} from "@expo/vector-icons";
 
 
 export type TabNavigatorParamList = {
@@ -116,12 +116,14 @@ const ProfileScreen = () => {
 
 
                {/* name , account handle , email  */}
+
              <Text className="mt-3 text-lg font-semibold">{name}</Text>
              <Text className="text-gray-500">{handle}</Text>
              <Text className="text-gray-500 text-sm mt-1">{email}</Text>
 
 
              {/* followers , following  */}
+
             <View className="flex-row justify-center mt-4 space-x-12"> 
                <View className="items-center">
                 <Text className="font-bold text-base">0</Text>
@@ -143,19 +145,71 @@ const ProfileScreen = () => {
 
         {/* tabs  */}
 
-        <View>
-           <Text>Trips</Text>
-           <Text>Guides</Text>
-           <TouchableOpacity>
-             
+        <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
+           <Text className="text-sm text-orange-500 font-semibold mr-6">Trips</Text>
+           <Text className="text-sm text-gray-500 mr-auto">Guides</Text>
+           <TouchableOpacity className="flex-row items-center space-x-1">
+              <Ionicons name="swap-vertical-outline" size={15} color="#666"/>
+              <Text className="text-sm text-gray-500">Sort</Text>
            </TouchableOpacity>
         </View>
 
 
-        </ScrollView>
+         {/* error message  */}
 
+         {error && (
+            <View className="px-4 mt-4">
+               <Text className="text-red-500 text-sm">
+                {error}
+               </Text>
+            </View>
+         )}
+
+         {/* trip cards  */}
+
+         {trips.length === 0 && !error && (
+          <View className="px-4 mt-4">
+            <Text className="text-gray-500 text-sm">No trip found.Create a new trip</Text>
+          </View>
+         )};
+
+
+         
+         {trips.map((trip , index) => (
+            <Pressable 
+             key={trip.id}
+             onPress={() => navigation.navigate("Home" , {screen : "PlanTrip" , params : {trip : rawTrips[index]}})} 
+             className="flex-row items-start bg-white rounded-xl shadow-sm mx-4 p-3 mt-4">
+
+
+              <Image source={{uri : trip.image}} className="h-16 w-16 rounded-lg mr-3"/>
+              <View className="flex-1">
+                 
+                 {trip.daysLeft && (
+                   <Text className="">
+                     In {trip.daysLeft} days
+                   </Text>
+                 )}
+
+                 <Text className="text-sm font-semibold text-gray-900 mb-1">
+                  {trip.name}
+                 </Text>
+
+                 <View className="">
+                   <Image source={{uri : "https://randomuser.me/api/portraits/men/32.jpg"}} className="w-4 h-4 rounded-full mr-2"/>
+                   <Text className="text-xs text-gray-500">
+                        {trip.date} . {trip.places} places
+                   </Text>
+                 </View>
+              </View>
+           <Entypo name="dots-three-vertical" size={14} color="#999"/>
+            </Pressable>
+         ))}
+        </ScrollView>
        </SafeAreaView>
     );
 };
 
+
+export default ProfileScreen;
 
