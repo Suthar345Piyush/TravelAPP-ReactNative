@@ -3,7 +3,7 @@ import React, {useCallback, useState} from "react";
 import { useClerk, useUser } from "@clerk/clerk-expo";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { HomeStackParamList } from "./HomeScreen";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import dayjs from "dayjs";
 
@@ -59,6 +59,35 @@ const ProfileScreen = () => {
            
         }
    } , [user]); 
+
+
+   useFocusEffect(
+     useCallback(() => {
+        fetchTrips();     
+     } , [fetchTrips])
+   );
+
+   if(!user){
+     return (
+       <View className="flex-1 justify-center items-center bg-white">
+         <Text className="text-lg text-gray-600">Please sign-in</Text>
+       </View>
+     )
+   };
+
+
+    // profile image of the user 
+    
+    const profileImage = user.imageUrl && user.externalAccounts.some(acc => acc.provider as string === "oauth_google") ? user.imageUrl : "https://cdn-icons-png.flaticon.com/128/3177/3177440.png";    //clean blank avatar 
+
+    const email = user.primaryEmailAddress?.emailAddress || "No email found";
+    const name = user.fullName || "Anonymous user";
+    
+
+
+
+
+
 
 
 
