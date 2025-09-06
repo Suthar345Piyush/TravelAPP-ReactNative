@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigation } from 'react-router-dom'
 import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
@@ -7,7 +7,8 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import dayjs from 'dayjs';
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {Ionicons} from "@expo/vector-icons";
 
 
 
@@ -235,9 +236,57 @@ const PlanTripScreen = () => {
 
 
   return (
-    <View>
-      <Text>PlanTripScreen</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+       <View className="relative w-full h-48">
+          <Image className="w-full h-full" source={{uri : trip.background || "https://via.placeholder.com/150"}}/>
+
+          <View className="absolute top-0 left-0 w-full h-full bg-black/30">
+             <TouchableOpacity className="absolute bottom-[-32px] left-4 right-4 bg-white p-4 rounded-xl shadow-md flex-row justify-between itmes-center">
+                <Ionicons name="arrow-back" color={"#000"} size={28}/>
+             </TouchableOpacity>
+
+             <View>
+                <Text className='text-lg font-semibold'>
+                   Trip to {trip?.tripName}</Text>
+                <Text className="text-sm text-gray-500 mt-1">
+                   {{trip.startDate ? dayjs(trip.startDate).format("MM D") : "N/A"}}
+                   {{trip.endDate ? dayjs(trip.endDate).format("MM D") : "N/A"}}
+                </Text>
+             </View>
+
+             <View>
+               <Image source={{uri : user?.imageUrl || "https://randomuser.me/api/portrait/woman/1.jpg"}} className='w-8 h-8 rounded-full mb-1'/>
+
+               <TouchableOpacity className="bg-black rounded-full px-3 py-1">
+                    <Text className="text-white text-xs">Share</Text>
+               </TouchableOpacity>
+             </View>
+             
+          </View>
+
+       </View>
+
+
+       <View>
+          {["Overview" , "Itinerary" , "Explore" , "$"].map((tab , index) => (
+            <TouchableOpacity onPress={() => setSelectedTab(tab)} className={`mr-6 pb-2 ${
+                selectedTab === tab ? "border-b-2 border-orange-500" : ""
+            }`}  key={index}>
+
+               <Text>{tab}</Text>
+            </TouchableOpacity>
+          ))}
+
+       </View>
+
+       {selectedTab === "Overview" && (
+          <ScrollView>
+            <View>
+               <Text>Wanderlog level: <Text>Basic</Text></Text>
+            </View>
+          </ScrollView>
+       )}
+    </SafeAreaView>
   )
 }
 
