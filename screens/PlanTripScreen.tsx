@@ -7,6 +7,8 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import dayjs from 'dayjs';
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
+import { parse } from '@babel/core';
+
 
 
 
@@ -106,6 +108,68 @@ const PlanTripScreen = () => {
    useFocusEffect(useCallback(() => {
       fetchTrip();
    } , [fetchTrip]));
+
+
+
+
+    //  fetching the open ai api responses 
+
+   const fetchAIPlaces = async () => {
+      setAiLoading(true);
+      setError(null);
+
+      try {
+         const response = await axios.post(
+           "",
+           {
+             model : "",
+             messages : [
+                {
+                   role : "system",
+                   content : `You are a travel assitant for ${trip.tripName || "a popular destination"}. Return a JSON array of 5 objects , each representing a top place to visit. Each object must have exactly these fields: "name" (string), "description" (string , 50-100 words), "address" (string). Ensure the response is valid JSON , with no backticks , markdown, or extra text. Example: [{"name" : "Place 1" , "description" : "A beautiful place..." , "address" : "123 Main St}]`, 
+                },
+                {
+                   role: "user",
+                   content : `List 5 top places to visit in ${trip.tripName || "a popular destination"} in JSON format.`,
+                }
+             ]
+           },
+
+           {
+            headers : {
+               Authorization : `Bearer token`,
+               "Content-Type" : "application/json",
+            },
+           }
+         );
+
+         let content = response.data.choices[0].message.content.trim();
+         content = content.replace(/```json\n?|\n?```/g, "");
+         const jsonMatch = content.match(/\[.*\]/s);
+
+         if(!jsonMatch) {
+           throw new Error("No valid JSON array found in response");
+         }
+
+        content = jsonMatch[0];
+
+
+        let places;
+        try {
+           places = JSON.parse(content);
+
+        } catch (parseError) {
+           console.error("JSON Parse error:" , parseError);
+           throw new Error("Invalid JSON format in AI response");
+        }
+
+      } catch(errpr){
+         
+      }
+
+   }
+
+   
 
 
 
