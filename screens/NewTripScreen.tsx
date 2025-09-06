@@ -13,6 +13,10 @@ import {GooglePlacesAutocomplete} from "react-native-google-places-autocomplete"
 import axios from 'axios';
 
 
+const GOOGLE_API_KEY = "abc";
+
+
+
 
 const NewTripScreen = () => {
    const [calendarVisible , setCalendarVisible] = useState(false);

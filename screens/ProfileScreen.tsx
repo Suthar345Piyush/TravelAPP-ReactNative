@@ -55,8 +55,9 @@ const ProfileScreen = () => {
            setTrips(formattedTrips);
            setRawTrips(response.data.trips);     // storing original trips 
            setError(null);
-        } catch(error){
-           
+        } catch(error : any){
+           console.error("Error fetching trips: " , error);
+           setError(error.response?.data?.error || "Failed to fetch trips");
         }
    } , [user]); 
 
@@ -143,7 +144,7 @@ const ProfileScreen = () => {
            </TouchableOpacity>
         </View>
 
-        {/* tabs  */}
+        {/* tabs like trips and guides with sort option */}
 
         <View className="flex-row items-center px-4 py-3 border-b border-gray-200">
            <Text className="text-sm text-orange-500 font-semibold mr-6">Trips</Text>
