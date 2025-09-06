@@ -249,10 +249,6 @@ const NewTripScreen = () => {
 
       {isLoading ? (
            <ActivityIndicator size={"small"} color="#fff"/>
-             
-
-
-
       ) : (
         <Text className='text-white font-semibold text-base'>Start Planning</Text>
       )}
