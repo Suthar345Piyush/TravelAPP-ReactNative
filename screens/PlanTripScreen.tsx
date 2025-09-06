@@ -1,9 +1,21 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigation } from 'react-router-dom'
-import { RouteProp, useRoute } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from './HomeScreen';
 import { useAuth, useUser } from '@clerk/clerk-expo';
+import dayjs from 'dayjs';
+import customParseFormat from "dayjs/plugin/customParseFormat";
+import axios from 'axios';
+
+
+
+
+dayjs.extend(customParseFormat);
+
+
+const GOOGLE_API_KEY = "abc";
+
 
 
 
@@ -63,10 +75,40 @@ const PlanTripScreen = () => {
 
 
 
+  const fetchTrip = useCallback(async () => {
+      try{
+         const clerkUserId = user?.id;
+         if(!clerkUserId || !trip._id){
+            setError("User or trip ID is missing");
+            return;           
+         }
+
+         const token = await getToken();
+
+         const response = await axios.get(`http://localhost:3000/api/trips/${trip._id}` , {
+           params : {clerkUserId},
+           headers : {Authorization : `Bearer ${token}`},
+         });
+
+         setTrip(response.data.trip);
+         setExpenses(response.data.trip.expense || []);
+         setError(null);
+      } 
+        catch(error : any){
+         console.error("Error fetching trip: " , error);
+         setError(error.response?.data?.error || "Failed to fetch trip"); 
+      }
+  } , [trip._id , user]);
 
 
 
- 
+
+   useFocusEffect(useCallback(() => {
+      fetchTrip();
+   } , [fetchTrip]));
+
+
+
 
   return (
     <View>
