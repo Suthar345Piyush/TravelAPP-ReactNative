@@ -7,7 +7,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import dayjs from 'dayjs';
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
-import { parse } from '@babel/core';
+
 
 
 
@@ -163,6 +163,62 @@ const PlanTripScreen = () => {
            throw new Error("Invalid JSON format in AI response");
         }
 
+        if(!Array.isArray(places) || places.length === 0){
+          throw new Error("AI response is not a valid array");
+        }
+
+        places.forEach((place) => {
+          if(!place.name || !place.description || !place.address){
+             throw new Error (
+                "Ai response missing required fields (name, description , address)"
+             );
+          }
+        });
+
+      
+      //   details of the place function 
+
+      const placesWithDetails = await Promise.all(
+            places.map(async (place : any) => {
+                 try {
+                   const findPlaceUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(
+                      `${place.name} , ${place.address}`
+                   )}&inputtype=textquery&fields=place_id&key=${GOOGLE_API_KEY}`;
+
+                   const findPlaceRes = await axios.get(findPlaceUrl);
+                   const placeId = findPlaceRes.data.candidate?.[0]?.place_id;
+
+                    if(!placeId){
+                      throw new Error(`No place_id found for ${place.name}`);
+                    }
+
+
+                    const detailsUrl = ``;
+                    const detailsRes = await axios.get(detailsUrl);
+                    const d = detailsRes.data.result;
+
+
+                    if(!d){
+                      throw new Error(`No details found for ${place.name}`);
+                    }
+
+
+                    return  {
+                      
+                    }
+
+
+
+
+                 } catch(error){
+                   
+                 }
+            })
+      )
+
+
+
+
       } catch(errpr){
          
       }
@@ -181,6 +237,5 @@ const PlanTripScreen = () => {
   )
 }
 
-export default PlanTripScreen
+export default PlanTripScreen;
 
-const styles = StyleSheet.create({})
