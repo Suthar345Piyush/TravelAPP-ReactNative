@@ -204,6 +204,10 @@ const PlanTripScreen = () => {
 
 
                     return  {
+                      id : placeId,
+                      name : d.name || place.name,
+                      briefDescription:
+                        d.editorial_summary?.overview?.slice(0 , 200) + "..." || place.description?.slice(0,200) + "..." || `Located in ${}`
                       
                     }
 
