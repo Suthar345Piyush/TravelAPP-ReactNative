@@ -280,9 +280,70 @@ const PlanTripScreen = () => {
        </View>
 
        {selectedTab === "Overview" && (
-          <ScrollView>
-            <View>
-               <Text>Wanderlog level: <Text>Basic</Text></Text>
+          <ScrollView className='px-4 pt-4'>
+            <View className="mb-6 bg-white rounded-lg p-4">
+               <Text className="text-sm text-gray-500 mb-1">Wanderlog level: <Text>Basic</Text></Text>
+
+               <View className="w-full h-2 bg=gray-200 rounded-full overflow-hidden">
+                  <View className="w-1/4 h-full bg-blue-500"/>
+               </View>
+            </View>
+
+            <View className="flex-row justify-between mb-6">
+               {[
+                  {
+                     title : "Add a reservation",
+                     subtitle : "Forward an email or add reservation details",
+                  },
+                  {
+                      title : "Explore things to do",
+                      subtitle : "Add places from top blogs",
+                  }
+               ].map((card , index) => (
+                <View key={index} className="w-[48%] bg-white p-4 rounded-lg shadow-sm">
+                  <Text className="font-semibold mb-2 text-sm">{card.title} </Text>
+                   <Text className="text-xs text-gray-500 mb-3">{card.subtitle}</Text>
+                     <View className="flex-row justify-between">
+                       <Text className="text-blue-500 text-xs font-medium">Skip</Text>
+                       <Text className="text-blue-500 text-xs font-medium">Start</Text>
+                  </View>
+               </View>
+               ))}
+            </View>
+
+            <View className="mb-6 bg-white rounded-lg p-4">
+             <Text className="font-semibold mb-3 text-base">Reservations and attachments</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {[
+                  {label : "Flight" , icon: "airplane"},
+                  { label : "Lodging" , icon : "bag" },
+                  {label : "Rental Car" , icon: "car"},
+                  {label : "Restaurant" , icon : "restaurant"},
+                  {label : "Attachments" , icon : "attach"},
+                  {label : "Other" , icon : "ellipsis-horizontal"},
+                ].map((item , index) => (
+                   <View key={index} className="items-center mr-6">
+                      <Ionicons name={item.icon as any} size={24}/>
+                      <Text className="text-xs mt-1">{item.label}</Text>
+                   </View>
+                ))}
+              </ScrollView>
+            </View>
+
+            <View className="border-t border-gray-200 bg-white">
+                <TouchableOpacity onPress={() => setShowNotes(!showNotes)} className="p-4 flex-row ">  
+                  <Text>Notes</Text>
+                  <Ionicons name={showNotes ? "chevron-up" : "chevron-down"} color={"gray"} size={20}/>
+                </TouchableOpacity>
+                {
+                  showNotes && (
+                     <View className="px-4 pb-4">
+                         <Text className="font-semibold text-sm text-gray-500">
+                           Write or paste general notes here, e.g. how to get around, local trips , reminders
+                         </Text>
+                     </View>
+                  )
+                }
             </View>
           </ScrollView>
        )}
