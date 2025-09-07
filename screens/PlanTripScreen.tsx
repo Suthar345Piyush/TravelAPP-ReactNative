@@ -335,16 +335,24 @@ const PlanTripScreen = () => {
                   <Text>Notes</Text>
                   <Ionicons name={showNotes ? "chevron-up" : "chevron-down"} color={"gray"} size={20}/>
                 </TouchableOpacity>
-                {
-                  showNotes && (
+                {showNotes && (
                      <View className="px-4 pb-4">
                          <Text className="font-semibold text-sm text-gray-500">
-                           Write or paste general notes here, e.g. how to get around, local trips , reminders
+                           Write or paste general notes here, e.g. how to get around, local tips , reminders
                          </Text>
                      </View>
-                  )
-                }
+                  )}
             </View>
+
+            <View>
+              <TouchableOpacity>
+                 <Text>
+                   
+                 </Text>
+               </TouchableOpacity>   
+            </View>
+
+
           </ScrollView>
        )}
     </SafeAreaView>
