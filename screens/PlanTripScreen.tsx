@@ -344,12 +344,21 @@ const PlanTripScreen = () => {
                   )}
             </View>
 
-            <View>
-              <TouchableOpacity>
-                 <Text>
-                   
-                 </Text>
+            <View className="border-t border-gray-200 bg-white"> 
+              <TouchableOpacity onPress={() => setShowPlaces(!showPlaces)}
+               className="p-4 flex-row justify-between items-center">
+                 <Text className="text-lg font-semibold">Places to visit</Text>
+                   <Ionicons name={showPlaces ? "chevron-up" : "chevron-down"} size={20} color="gray"/>
                </TouchableOpacity>   
+
+               {showPlaces && (
+                   <View>
+                    {(trip.placesToVisit || []).map((place: any , index : number) => renderPlaceCard(place , index))}
+
+
+                    
+                     </View>
+               )}
             </View>
 
 
