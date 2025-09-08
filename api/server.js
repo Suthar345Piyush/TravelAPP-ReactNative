@@ -1,7 +1,6 @@
-
 import mongoose from "mongoose";
 import express from "express";
-import nodeMailer from "nodemailer";
+import nodemailer from "nodemailer";
 import cors from "cors";
 import axios from "axios";
 
@@ -24,12 +23,29 @@ mongoose.connect(mongoUri).then(() => {
 }).catch(err => {
    console.log("Mongodb connection error" , err);
    process.exit(1);
-})
+});
+
 
 
 app.listen(port , () => {
    console.log("Server is running at port 3000");
-})
+});
+
+
+// node mailer setup in the server.js file  
+
+const transporter = nodemailer.createTransport({
+    service : "gmail",
+    auth : {
+       user : "",
+       pass : "",
+    },
+});
+
+
+
+
+
 
 
 app.get("/" , (req , res) => { 
@@ -126,6 +142,32 @@ app.get("/" , async(req , res) => {
     } catch(error){
         console.log("Error" , error);
         res.status(500).json({error : "Failed to fetch trip"});
+    }
+});
+
+
+
+app.post("/api/send-email" , async(req , res) => {
+    try{
+        const {email , subject , message} = req.body;
+        if(!email || !subject , !message){
+          return res.subject(400).json({error : "Email , subject and message is required"});
+        };
+
+        const mailOptions = {
+           from : "",
+           to : email,
+           subject : subject,
+           text : message,
+        };
+
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({message : "Mail sent successfully"});
+
+
+    } catch(error) {
+         console.log("Error" , error);
+         res.status(500).json({error : "Failed to send Email"});
     }
 });
 

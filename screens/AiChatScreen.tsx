@@ -197,15 +197,14 @@ const AIChatScreen = () => {
 
          <View className="flex-row items-center border rounded-full px-4 py-2 mb-4 bg-gray-50">
             <TextInput className='flex-1 text-sm' placeholder='Ask me travel related questions'
-             value={input} onChangeText={setInput}/>
+               value={input} onChangeText={setInput}/>
 
-             <TouchableOpacity onPress={() => askAI(input)} disabled={!input.trim()}>
-
-              <Ionicons name="arrow-forward" size={24} color="black"/>
-             </TouchableOpacity>
-         </View>
-       </KeyboardAvoidingView>
-      </View>
+                <TouchableOpacity onPress={() => askAI(input)} disabled={!input.trim()}>
+               <Ionicons name="arrow-forward" size={24} color="black"/>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
    );
 };
 
