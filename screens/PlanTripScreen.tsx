@@ -1,6 +1,6 @@
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { useNavigation } from 'react-router-dom'
+import { useNavigation } from '@react-navigation/native';
 import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
 import { HomeStackParamList } from './HomeScreen';
 import { useAuth, useUser } from '@clerk/clerk-expo';
@@ -8,7 +8,7 @@ import dayjs from 'dayjs';
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {Ionicons} from "@expo/vector-icons";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 
 
 
@@ -75,6 +75,14 @@ const PlanTripScreen = () => {
      {label : "Don't Split" , value : "Don't Split"},
      {label : "Everyone" , value : "Everyone"},
   ];
+
+
+
+  const renderPlaceCard = (place , index) => {
+      
+
+
+  }
 
 
 
@@ -344,26 +352,57 @@ const PlanTripScreen = () => {
                   )}
             </View>
 
-            <View className="border-t border-gray-200 bg-white"> 
-              <TouchableOpacity onPress={() => setShowPlaces(!showPlaces)}
-               className="p-4 flex-row justify-between items-center">
-                 <Text className="text-lg font-semibold">Places to visit</Text>
-                   <Ionicons name={showPlaces ? "chevron-up" : "chevron-down"} size={20} color="gray"/>
-               </TouchableOpacity>   
 
-               {showPlaces && (
-                   <View>
-                    {(trip.placesToVisit || []).map((place: any , index : number) => renderPlaceCard(place , index))}
+            <View className="border-t border-gray-200 bg-white">
+                <TouchableOpacity onPress={() => setShowPlaces(!showPlaces)} className="p-4 flex-row ">  
+                  <Text>Places to Visit</Text>
+                  <Ionicons name={showNotes ? "chevron-up" : "chevron-down"} color={"gray"} size={20}/>
+                </TouchableOpacity>
+                {showPlaces && (
+                     <View className="px-4 pb-4">
+                        {(trip?.placesToVisit || []).map((place:any , index:number) => 
+                          renderPlaceCard(place , index)
+                        )}
 
 
-                    
+                        {(!trip?.placesToVisit || trip.placesToVisit.length == 0) && (
+                           <Text className='text-sm text-gray=500'>No Places added yet</Text>
+                        )}
+                        <TouchableOpacity className='border border-gray-300 rounded-lg px-4 py-2 mt-2'>
+                           <Text className="text-sm text-gray-500">
+                             Add a place
+                           </Text>
+                        </TouchableOpacity>
                      </View>
-               )}
+                  )}
             </View>
-
-
           </ScrollView>
        )}
+
+
+     {/* side icons like ai chat and maps like things  */}
+
+       <View className='absolute right-4 bottom-20 space-y-3 items-end'>
+          <TouchableOpacity onPress={() => navigation.navigate("AIChat" , {
+             location : trip.tripName || "Unknown"
+          })}
+          className="w-12 h-12 rounded-full bg-gradien-to-tr from-pink-400 to bg-purple-600 items-center justify-center shadow">
+            <MaterialIcons name="auto-awesome" size={24} color="#fff"/>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity className="w-12 h-12 rounded-full bg-black items-center justify-center shadow mt-2">
+            <Ionicons name="map" size={24} color="#fff"/>
+          </TouchableOpacity>
+
+
+          <TouchableOpacity className="w-12 h-12 rounded-full bg-black  items-center justify-center shadow mt-2">
+            <Ionicons name="add" size={24} color="#fff"/>
+          </TouchableOpacity>
+
+
+
+       </View>
     </SafeAreaView>
   )
 }
