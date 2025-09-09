@@ -174,7 +174,7 @@ app.post("/api/send-email" , async(req , res) => {
 
 
 
-app.post("/api/trips:/tripId/places" , async (req , res) => {
+app.post("/api/trips/:tripId/places" , async (req , res) => {
     try {
        const {tripId} = req.params;
        const {placeId} = req.body;

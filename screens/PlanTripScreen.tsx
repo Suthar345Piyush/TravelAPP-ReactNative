@@ -1,4 +1,4 @@
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image,  ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import { Modal } from "react-native-modal"
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 
 
 
@@ -399,13 +401,61 @@ const PlanTripScreen = () => {
           <TouchableOpacity className="w-12 h-12 rounded-full bg-black  items-center justify-center shadow mt-2">
             <Ionicons name="add" size={24} color="#fff"/>
           </TouchableOpacity>
-
-
-
        </View>
+
+
+        <Modal isVisible={modalVisible} onBackdropPress={() => {
+          setModalVisible(false);
+          setSelectedDate(null);
+          setModalMode("place");
+          setEditingExpense(null);
+          setAiPlaces([]);
+          setExpenseForm({
+             description: "",
+             category : "",
+             amount : "",
+             paidBy : "Piyush Suthar",
+             splitOption : "Don't Split",
+          });
+        }} style={{justifyContent : "flex-end" , margin : 0}}>
+
+
+         <View>
+            {modalMode === "place" && selectedTab !== "Itinerary"  ? (
+                <>
+                <Text className="text-lg font-medium mb-4">
+                   Search for a place                   
+                </Text>
+                <GooglePlacesAutocomplete placeholder='Search for a place' 
+                fetchDetails={true}
+                 enablePoweredByContainer={false}
+                  onPress={async (data , details = null) => {
+                      try {
+                         const placeId  = data.place_id;
+                         const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`;
+                         const res = await fetch(url);
+                         const json = await res.json();
+                      } catch(error){
+                         
+                      }
+                  }}>
+
+                </GooglePlacesAutocomplete>
+                </>
+            ) : ()}
+         </View>
+
+
+
+
+          
+        </Modal>
     </SafeAreaView>
   )
 }
 
 export default PlanTripScreen;
+
+
+
 
