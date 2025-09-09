@@ -11,6 +11,7 @@ const port = process.env.PORT || 3000;
 
 import Trip from "./models/trip.js";
 import User from "./models/user.js";
+import { deepOrange } from "@mui/material/colors";
 
 
 
@@ -170,6 +171,94 @@ app.post("/api/send-email" , async(req , res) => {
          res.status(500).json({error : "Failed to send Email"});
     }
 });
+
+
+
+app.post("/api/trips:/tripId/places" , async (req , res) => {
+    try {
+       const {tripId} = req.params;
+       const {placeId} = req.body;
+       const API_KEY = 'abc';
+       if(!placeId){
+           return res.status(400).json({error : "Place Id is required"});
+       }
+
+
+       const trip = await Trip.findById(tripId);
+
+       if(!trip){
+          return res.status(404).json({error : "Trip not found"});
+       }
+
+
+       const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${API_KEY}`;
+
+       const response = await axios.get(url);
+       const {status , result : details} = response.data;
+
+       if(status !== 'OK' || !details){
+          return res.status(400).json({error : `Google Places API error: ${status}`});
+       }
+
+       const placeData = {
+          name : details.name || 'Unknown Place',
+          phoneNumber : details.formatted_phone_number || '',
+          website : details.website || '',
+          openingHour : details.opening_hour?.weekday_text || [],
+          photos: details.photos?.map(
+             photo => `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${API_KEY}`
+          ) || [],
+          reviews : details.reviews?.map(review => ({
+             authorName : review.author_name || 'Unknown',
+             rating : review.rating || 0,
+             text : review.text || '',
+          })) || [],
+
+          types : details.types || [],
+          formatted_address :  details.formatted_address || "No address available",
+          briefDescription : 
+             details?.editorial_summary?.overview?.slice(0, 200) + "..." || 
+             details?.review?.[0]?.text?.slice(0, 200) + "..." || 
+             `Located in ${details.address_components?.[2]?.long_name || details.formatted_address || "this area"}. A nice place to visit.`,
+
+             geometry : {
+                location : {
+                   lat : details.geometry?.location?.lat || 0,
+                   lng : details.geometry?.location?.lng || 0,
+                },
+
+                viewport : {
+                   northeast : {
+                      lat : details.geometry?.viewport?.northeast?.lat || 0,
+                      lng : details.geometry?.viewport?.northeast?.lng || 0,
+                   },
+                   southwest : {
+                      lat : details.geometry?.viewport?.southwest?.lat || 0,
+                      lng : details.geometry?.viewport?.southwest?.lng || 0,
+                   }
+                }
+             }
+       };
+
+
+       const updatedTrip = await Trip.findByIdAndUpdate(
+         tripId,
+         {$push : {placesToVisit : placeData}},
+         {new : true}
+       );
+
+       res.status(200).json({message : "Place added successfully" , trip : updatedTrip});
+
+    } catch(error){
+        console.log("Error" , error);
+        res.status(500).json({error : "Failed to add place to trip"});
+    }
+});
+
+
+
+
+
 
 
 
