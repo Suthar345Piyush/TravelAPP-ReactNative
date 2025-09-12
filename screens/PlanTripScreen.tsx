@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import  Modal  from "react-native-modal"
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { Language } from '@mui/icons-material';
+
 
 
 dayjs.extend(customParseFormat);
@@ -74,11 +74,75 @@ const PlanTripScreen = () => {
 
 
 
-  const renderPlaceCard = (place , index) => {
-      
+  const renderPlaceCard = (place , index) => {};
+
+  const handleAddPlace = async ( data : any) => {
+      try {
+          const placeId = data.place_id;
+          if(!placeId || !trip._id){
+             setError("Place or trip ID missing");
+             return;
+          }
 
 
-  }
+          const token = await getToken();
+          await axios.post(
+              `http://localhost:3000/api/trips/${trip._id}/places`,
+              {placeId},
+              {headers : {Authorization : `Bearer ${token}`}}
+          );
+
+          await fetchTrip();
+          setModalVisible(false);
+          setSelectedDate(null);
+      } catch(error : any){
+          console.error("Error adding place: " , error);
+          setError(error.response?.data?.error || "Failed to add place");
+      }
+  };
+
+   //  function for the adding place to itinerary 
+
+   const handlePlaceToItinerary =  async (place : any  , date : string) =>  {
+       try {
+         if(!trip._id || !date){
+             setError("Trip Id or date is missing");
+             return;
+         }
+
+         const token = await getToken();
+         const payload = place.id || place.place_id ? {
+             placeId : place.id || place.place_id , date 
+         } : {
+             placeData : place , date
+         };
+
+
+         await axios.post(
+             `http://localhost:3000/api/trips/${trip._id}/itinerary`,
+             payload, {
+               headers : {Authorization : `Bearer ${token}`}
+             }
+         );
+
+         await fetchTrip();
+         setModalVisible(false);
+         setSelectedDate(null);
+       }catch (error : any) {
+         console.error("Error adding place to itinerary:" , error);
+         setError(error.response?.data?.error || "Failed to add place to itinerary");
+       }
+   };
+
+
+   
+
+
+
+
+
+
+
 
 
 
@@ -468,7 +532,11 @@ const PlanTripScreen = () => {
                                })) || [],
                      };
 
-                     await handleAddPlaces(data);
+                     if(selectedDate){
+                        await handlePlaceToItinerary(place , selectedDate)
+                     } else {
+                         await handleAddPlace(data);
+                     }
                    } catch(error){
                       console.log("Error" , error);
                    }
