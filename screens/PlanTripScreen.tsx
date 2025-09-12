@@ -9,8 +9,9 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import axios from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
-import { Modal } from "react-native-modal"
+import  Modal  from "react-native-modal"
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import { Language } from '@mui/icons-material';
 
 
 
@@ -404,52 +405,72 @@ const PlanTripScreen = () => {
        </View>
 
 
-        <Modal isVisible={modalVisible} onBackdropPress={() => {
+        <Modal isVisible={modalVisible}  onBackdropPress={() => {
           setModalVisible(false);
           setSelectedDate(null);
           setModalMode("place");
-          setEditingExpense(null);
-          setAiPlaces([]);
-          setExpenseForm({
-             description: "",
-             category : "",
-             amount : "",
-             paidBy : "Piyush Suthar",
-             splitOption : "Don't Split",
-          });
-        }} style={{justifyContent : "flex-end" , margin : 0}}>
+
+      
 
 
-         <View>
-            {modalMode === "place" && selectedTab !== "Itinerary"  ? (
-                <>
-                <Text className="text-lg font-medium mb-4">
-                   Search for a place                   
-                </Text>
-                <GooglePlacesAutocomplete placeholder='Search for a place' 
-                fetchDetails={true}
+
+        }}>
+         {modalMode == "place" || modalMode == "ai"} ? (
+            <>
+             <Text>
+                {selectedDate ?  `Add Place to ${dayjs(selectedDate).format("ddd D/M")}` : "Search for the Places"}
+             </Text>
+
+
+             {modalMode === "place" && (
+                <GooglePlacesAutocomplete placeholder='Search for a Place'
+                 fetchDetails={true}
                  enablePoweredByContainer={false}
-                  onPress={async (data , details = null) => {
-                      try {
-                         const placeId  = data.place_id;
-                         const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`;
-                         const res = await fetch(url);
-                         const json = await res.json();
-                      } catch(error){
-                         
-                      }
-                  }}>
+                  query={{
+                      key : GOOGLE_API_KEY,
+                      language="en",
+                      }}
+                      
+                      styles={{
+                         container : {flex : 0},
+                         textInputContainer : {
+                            flexDirection : "row",
+                            backgroundColor : "#f1f1f1",
+                            borderRadius : 30,
+                            paddingHorizontal : 10,
+                            alignItems : "center",
+                         },
+                          textInput : {
+                            flex : 1,
+                            height : 44,
+                            color : "#333",
+                            fontSize : 16,
+                            backgroundColor : "#f1f1f1",
+                            borderRadius : 25,
+                          },
+                          
+                          listView : {
+                            marginTop : 10,
+                            backgroundColor : "#fff",
+                          }
+                      }}
+                      
+                      
+                      >
 
                 </GooglePlacesAutocomplete>
-                </>
-            ) : ()}
-         </View>
+             )}
+            </>
+         ) : (
+             
+         )
 
-
-
-
-          
         </Modal>
+
+
+
+
+       
     </SafeAreaView>
   )
 }
