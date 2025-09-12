@@ -14,17 +14,10 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { Language } from '@mui/icons-material';
 
 
-
-
-
 dayjs.extend(customParseFormat);
 
 
 const GOOGLE_API_KEY = "abc";
-
-
-
-
 
 
 const PlanTripScreen = () => {
@@ -426,6 +419,60 @@ const PlanTripScreen = () => {
                 <GooglePlacesAutocomplete placeholder='Search for a Place'
                  fetchDetails={true}
                  enablePoweredByContainer={false}
+                 onPress={async (data , details = null) => {
+                   try {
+                     const placeId = data.place_id;
+                     const url =  `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${GOOGLE_API_KEY}`;
+                     const res = await fetch(url);
+                     const json = await res.json();
+
+                     if(json.status !== " OK" || !json.result){
+                         throw new Error(`Google places api error ${json.status || "No res found"}`);
+                     }
+
+
+                     const d = json.result;
+                     const place = {
+                         id : placeId,
+                         name : d.name || "Unknown Place",
+                         briefDescription : d.editorial_summary?.overview?.slice(0 , 200) + "..." || 
+                         d.reviews?.[0]?.text?.slice(0 , 200) + "..." || 
+                         `Located in ${
+                           d.address_components?.[2]?.long_name || 
+                           d.formatted_address || "this area"
+                         }. A nice place to visit.`,
+
+                         photos : 
+                           d.photos?.map(
+                              (photo : any) => 
+                              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}`
+                           ) || [],
+                           formatted_address:
+                             d.formatted_address || "No address available",
+                             openingHours: d.opening_hours?.weekday_text || [],
+                             phoneNumber : d.formatted_phone_number || "",
+                             website : d.website || "",
+                             geometry : d.geometry || {
+                               location : {lat : 0 , lng : 0},
+                                viewport : {
+                                  northeast : {lat : 0 , lng : 0},
+                                  southwest : {lat : 0 , lng : 0},
+                                },
+                             },
+                             types : d.types || [],
+                             reviews : 
+                               d.reviews?.map((review : any) => ({
+                                  authorName : review.author_name || "Unknown",
+                                  rating : review.rating || 0,
+                                  text : review.text || "",
+                               })) || [],
+                     };
+
+                     await handleAddPlaces(data);
+                   } catch(error){
+                      console.log("Error" , error);
+                   }
+                 }}
                   query={{
                       key : GOOGLE_API_KEY,
                       language="en",
@@ -453,10 +500,7 @@ const PlanTripScreen = () => {
                             marginTop : 10,
                             backgroundColor : "#fff",
                           }
-                      }}
-                      
-                      
-                      >
+                      }}>
 
                 </GooglePlacesAutocomplete>
              )}
