@@ -6,7 +6,7 @@ import { HomeStackParamList } from './HomeScreen';
 import { useAuth, useUser } from '@clerk/clerk-expo';
 import dayjs from 'dayjs';
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import axios from 'axios';
+import axios, { isAxiosError } from 'axios';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {Ionicons, MaterialIcons} from "@expo/vector-icons";
 import  Modal  from "react-native-modal"
@@ -134,12 +134,135 @@ const PlanTripScreen = () => {
 
 
    // function for deleting the expenses 
-   
+
    const handleDeleteExpense = (id : string) => {
        setExpenses((prev) => prev.filter((expense) => expense.id !== id));
    };
 
-  const renderPlaceCard = (place , index) => {};
+  const renderPlaceCard = (place :any , index : number , isItinerary : boolean = false) => {
+    const isActive = activePlace?.name === place.name;
+     return (
+       <View key={index} className="mb-4 bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+         <TouchableOpacity onPress={() => setActivePlace(isActive ? null : place)} className="flex-row items-center">
+
+            <Image source={{uri : place.photos?.[0] || "https://via.placeholder.com/150"}}
+             className="w-24 h-24 rounded-l-xl" resizeMode='cover'
+            />
+
+            <View className="flex-1 p-3">
+                 <Text className="text-gray-800 font-bold text-base mb-1">
+                   {place.name || "Unknown Place"}
+                 </Text>
+                 <Text className="text-gray-600 text-sm leading-5" numberOfLines={2}>
+                   {place.briefDescription || "No Description is available"}
+                 </Text>
+                 <View className="flex-row items-center mt-1">
+                    {renderStars(getAverageRating(place.reviews))}
+                    <Text className="text-xs text-gray-500 ml-1">
+                       ({getAverageRating(place.review)}/5)
+                    </Text>
+                 </View>
+            </View>
+         </TouchableOpacity>
+
+
+         {isActive && (
+             <View className="p-4 bg-gray-50 border-t border-gray-200">
+               <View className="mb-4">
+                  <View className="flex-row items-center">
+                     <Ionicons name="location" size={16} color="#4B5563"/>
+                      <Text className="text-sm font-semibold text-gray-700 ml-1">
+                     Address
+                      </Text>
+                     </View>
+                     <Text className="text-sm text-gray-600 mt-1">
+                        {place.formatted_address || "No address available"}
+                     </Text>
+                  </View>
+
+
+                  {place.openingHours?.length > 0 && (
+                      <View className="mb-4">
+                        <View className="flex-row items-center">
+                           <Ionicons name="time" size={16} color="4B5563"/>
+                           <Text className="text-sm font-semibold text-gray-700 mlinant">
+                              Today's Hours
+                           </Text>
+                           </View>
+                           <Text className="text-sm text-gray-600 mt-1">{
+                              getCurrentDayHours(place.openingHours)
+                           }</Text>
+                        </View>
+                  )}
+
+                  {place.phoneNumber  && (
+                      <View className="mb-4">
+                        <View className="flex-row items-center">
+                              <Ionicons name="call" size={16} color="4B5563"/>
+                              <Text className="text-sm font-semibold text-gray-700 ml-1">
+                                 Phone
+                              </Text>
+                           </View>
+                           <Text className="text-sm text-gray-600 mt-1">
+                              {place.phoneNumber}
+                           </Text>
+                        </View>
+                  )}
+
+                  {place.website && (
+                      <View className="mb-4">
+                      <View className="flex-row items-center">
+                            <Ionicons name="globe" size={16} color="4B5563"/>
+                            <Text className="text-sm font-semibold text-gray-700 ml-1">
+                               Website
+                            </Text>
+                         </View>
+                         <Text className="text-sm text-gray-600 mt-1" numberOfLines={1}>
+                            {place.website}
+                         </Text>
+                      </View>
+                  )}
+
+
+                  {place.reviews?.length > 0 && (
+                      <View className="mb-4">
+                        <View className="flex-row items-center">
+                            <Ionicons name="star" size={16} color="4B5563"/>
+                            <Text className="text-sm font-semibold text-gray-700 ml-1">Review</Text>
+                           </View>
+                           <Text className="text-sm text-gray-600 italic mt-1">
+                              "{place.reviews[0].text.slice(0 , 100)}
+                               {place.reviews[0].text.length > 100 ? "..." : ""}"
+                           </Text>
+                           <View className="flex-row items-center mt-1">
+                               {renderStars(place.reviews[0].rating)}
+                               <Text className="text-xs text-gray-500 ml-1">
+                              - {place.reviews[0].authorName}{(place.reviews[0].rating)/5}
+                               </Text>
+                              </View>
+                        </View>
+                  )}
+
+                  {place.types?.length > 0 && (
+                      <View>
+                        <View className="flex-row items-center">
+                           <Ionicons name="pricetag" size={16} color="4B5563"/>
+                           <Text className="text-sm font-semibold text-gray-700 ml-1">
+                              Categories
+                           </Text>
+                           </View>
+                           <View className="flex-row flex-wrap mt-1">
+                              {renderPlaceTypes(place.types)}
+                        </View>
+                    </View>
+                  )}
+             </View>
+         )}
+       </View>
+     )
+  };
+
+
 
   const handleAddPlace = async ( data : any) => {
       try {
