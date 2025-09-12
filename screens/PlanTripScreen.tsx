@@ -73,6 +73,71 @@ const PlanTripScreen = () => {
   ];
 
 
+   // function for adding  expenses 
+
+   const handleAddExpense = () => {
+       if(!expenseForm.description || !expenseForm.category || !expenseForm.amount){
+          setError("Please fill all the expenses field's first");
+          return;
+       }
+
+
+      //   for adding some new expenses 
+      const newExpense = {
+          id : Date.now().toString(),
+          ...expenseForm,
+          price : parseFloat(expenseForm.amount),
+          date : dayjs().format("YYYY-MM-DD"),
+      };
+
+   // having those attributes in the expense form 
+
+      setExpenses((prev) => [...prev , newExpense]);
+       setExpenseForm({
+         description : "",
+         category : "",
+         amount : "",
+         paidBy : "Piyush Suthar",
+         splitOption : "Don't Split",
+       });
+       setModalVisible(false);
+       setModalMode("place");
+   };
+
+
+   // function to edit expenses 
+
+   const handleEditExpense = () => {
+       if(!editingExpense || !expenseForm.description || !expenseForm.category || !expenseForm.amount) {
+          setError("Please fill all the expenses field's first");
+          return;
+       }
+
+       setExpenses((prev) => 
+        prev.map((expense) => expense.id === editingExpense.id ? {
+          ...expense,
+          ...expenseForm,
+          price : parseFloat(expenseForm.amount),
+        } : expense));
+
+        setExpenseForm({
+         description : "",
+         category : "",
+         amount : "",
+         paidBy : "Piyush Suthar",
+         splitOption : "Don't Split",
+        });
+        setEditingExpense(null);
+        setModalVisible(false);
+        setModalMode("place");
+   };
+
+
+   // function for deleting the expenses 
+   
+   const handleDeleteExpense = (id : string) => {
+       setExpenses((prev) => prev.filter((expense) => expense.id !== id));
+   };
 
   const renderPlaceCard = (place , index) => {};
 
@@ -133,15 +198,6 @@ const PlanTripScreen = () => {
          setError(error.response?.data?.error || "Failed to add place to itinerary");
        }
    };
-
-
-   
-
-
-
-
-
-
 
 
 
