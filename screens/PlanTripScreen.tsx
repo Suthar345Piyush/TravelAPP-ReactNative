@@ -157,8 +157,30 @@ const PlanTripScreen = () => {
        }));
    };
 
+   // function to getting the current day hours 
+
+   const getCurrentDayHours = (openingHours : string[]) => {
+       if(!openingHours || openingHours.length === 0) return "Hours unavailable";
+       const today = dayjs().format("dddd").toLowerCase();
+       const todayHours = openingHours.find((line) => 
+         line.toLowerCase().startsWith(today)
+       );
+
+       return todayHours || openingHours[0] || "Hours unavailable";
+   };
+
+   // function for rendering the rating stars 
+   
+   const renderStars = () => {
+       
+   }
+
+
 
    
+
+
+
 
 
 
