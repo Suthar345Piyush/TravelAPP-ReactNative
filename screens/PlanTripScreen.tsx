@@ -139,6 +139,34 @@ const PlanTripScreen = () => {
        setExpenses((prev) => prev.filter((expense) => expense.id !== id));
    };
 
+   // function for the generate trip dates 
+
+   const generateTripDates = () => {
+       const start =  dayjs(trip.startDate || new Date());
+       const end =  dayjs(trip.endDate || new Date());
+       const days = [];
+
+
+       for(let d = start; d.isBefore(end) || d.isSame(end); d = d.add(1 , "day")){
+          days.push(d);
+       }
+
+       return days.map((d) => ({
+          label : d.format("ddd D/M"),
+          value : d.format("YYYY-MM-DD"),
+       }));
+   };
+
+
+   
+
+
+
+
+
+
+
+
   const renderPlaceCard = (place :any , index : number , isItinerary : boolean = false) => {
     const isActive = activePlace?.name === place.name;
      return (
@@ -478,10 +506,6 @@ const PlanTripScreen = () => {
    }
 
    
-
-
-
-
   return (
     <SafeAreaView className="flex-1 bg-white">
        <View className="relative w-full h-48">
