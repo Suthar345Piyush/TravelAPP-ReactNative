@@ -159,7 +159,7 @@ const PlanTripScreen = () => {
 
    // function to getting the current day hours 
 
-   const getCurrentDayHours = (openingHours : string[]) => {
+   const getCurrentDayHours = (openingHours : string[]) : string => {
        if(!openingHours || openingHours.length === 0) return "Hours unavailable";
        const today = dayjs().format("dddd").toLowerCase();
        const todayHours = openingHours.find((line) => 
@@ -171,22 +171,38 @@ const PlanTripScreen = () => {
 
    // function for rendering the rating stars 
    
-   const renderStars = () => {
-       
+   const renderStars = (rating : number) => {
+        const stars = [];
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+
+        for(let i = 0; i < 5; i++){
+          if(i < fullStars){
+             stars.push(<Ionicons key={i} name="star" size={14} color="#FFD700"/>);
+          } else if(i === fullStars && hasHalfStar){
+             stars.push(
+               <Ionicons key={i} name="star-half" size={14} color="FFD700"/>
+             );
+          } else {
+             stars.push(
+               <Ionicons key={i} name="star-outline" size={14} color="FFD700"/>
+             )
+          }
+        }
+        return stars;
    }
 
+   //function for getting the avarage rating  
 
+   const getAverageRating = (reviews : any[]) => {
+       if(!reviews || reviews.length === 0) return 0;
+       const total = reviews.reduce(
+          (sum , review) => sum + (review.rating || 0),
+          0
+       );
 
-   
-
-
-
-
-
-
-
-
-
+       return (total / reviews.length).toFixed(1);
+   };
 
 
   const renderPlaceCard = (place :any , index : number , isItinerary : boolean = false) => {
@@ -505,29 +521,131 @@ const PlanTripScreen = () => {
                       id : placeId,
                       name : d.name || place.name,
                       briefDescription:
-                        d.editorial_summary?.overview?.slice(0 , 200) + "..." || place.description?.slice(0,200) + "..." || `Located in ${}`
-                      
-                    }
+                        d.editorial_summary?.overview?.slice(0 , 200) + "..." || place.description?.slice(0,200) + "..." || `Located in ${
+                           d.address_components?.[2]?.long_name || 
+                           d.formatted_address || 
+                           "this area"
+                        }. A nice place to visit.`,
+                        photos : d.photos?.map(
+                           (photo : any) => 
+                            `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${GOOGLE_API_KEY}`
+                        ) || ["https://via.placeholder.com/150"],
+                        formatted_address : d.formatted_address || place.address,
+                        openingHours : d.opening_hours?.weekday_text || [],
+                        phoneNumber : d.formatted_phone_number || "",
+                        website : d.website || "",
+                        geometry : d.geometry || {
+                           location : {lat : 0 , lng : 0},
+                           viewport : {
+                               northeast : {lat : 0 , lng : 0},
+                               southwest : {lat : 0 , lng : 0},
+                           }
+                        },
+                        types: d.types || ["point_of_interest"],
+                        reviews: 
+                          d.reviews?.map((review : any) => ({
+                            authorName : review.author_name || "Unknown",
+                            rating : review.rating || 0,
+                            text : review.text || "",
+                          })) || [],
+                    };
+                 } catch(err : any){
+                   console.warn(`Failed to fetch details for ${place.name}:` , err.message);
 
-
-
-
-                 } catch(error){
-                   
+                   return {
+                   id:`ai-${place.name.replace(/\s/g,"-").toLowerCase()}`,
+                   name : place.name,
+                   briefDescription : place.description,
+                   formatted_address : place.address,
+                   photos:["https://via.placeholder.com/150"],
+                   types : ["point_of_interest"],
+                   openingHours : [],
+                   phoneNumber : "",
+                   website : "",
+                   geometry : {
+                     location : {lat : 0 , lng : 0},
+                      viewport : {
+                        northeast : {lat : 0 , lng : 0},
+                        southwest : {lat : 0, lng : 0},
+                      }
+                   },
+                   reviews: [],             
+                   };
                  }
             })
-      )
+      );
 
-
-
-
-      } catch(errpr){
-         
+      setAiPlaces(placesWithDetails);
+      setModalMode("ai");
+      setModalVisible(true);
+      } catch(error : any){
+         console.error("Error fetching AI places:" , error.message);
+         setError(`Failed to fetch Ai recommendation: ${error.message}`);
+         setAiPlaces([
+            {
+                id : "ai-fallback-1",
+                name : "Placeholder Attraction",
+                briefDescription : "A popular place to visit in this destination",
+                formatted_address : "Unknown Address",
+                photos:["https://via.placeholder.com/150"],
+                types : ["point_of_interest"],
+                openingHours : [],
+                phoneNumber : "",
+                website : "",
+                geometry : {
+                  location : {lat : 0 , lng : 0},
+                   viewport : {
+                     northeast : {lat : 0 , lng : 0},
+                     southwest : {lat : 0, lng : 0},
+                   }
+                },
+                reviews : [],
+            }
+         ]);
+         setModalMode("ai");
+         setModalVisible(true);
+      } finally {
+          setAiLoading(false);
       }
+   };
 
-   }
 
-   
+   // function for rendering the different place types 
+
+   const renderPlaceTypes = (types : string[]) => {
+       const allowedTypes = [
+          "rv_park",
+          "tourist_attraction",
+          "lodging",
+          "point_of_interest",
+          "establishment",
+       ];
+
+       const filterdTypes = types?.filter((type) => allowedTypes.includes(type)) || [];
+
+       const typeColors : any = {
+          rv_park : "text-green-600",
+          tourist_attraction : "text-blue-600",
+          lodging : "text-purple-600",
+          point_of_interest : "text-orange-600",
+          establishment : "text-gray-600",
+       };
+
+        return filterdTypes.map((type , index) => (
+          <View key={index} className="bg-gray-100 px-3 py-1 rounded-full mr-2 mb-1">
+             <Text className={`text-xs font-medium ${
+                typeColors[type] || "text-gray-700"
+             } capitalize`}>
+               {type.replace(/_/g, "")}
+             </Text>
+          </View>
+        ));
+   };
+
+
+
+
+
   return (
     <SafeAreaView className="flex-1 bg-white">
        <View className="relative w-full h-48">
