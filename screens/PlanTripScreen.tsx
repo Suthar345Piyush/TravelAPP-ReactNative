@@ -357,7 +357,7 @@ const PlanTripScreen = () => {
 
    //  function for the adding place to itinerary 
 
-   const handlePlaceToItinerary =  async (place : any  , date : string) =>  {
+   const handleAddPlaceToItinerary =  async (place : any  , date : string) =>  {
        try {
          if(!trip._id || !date){
              setError("Trip Id or date is missing");
@@ -748,6 +748,90 @@ const PlanTripScreen = () => {
        );
    };
 
+    // function for rendering the expenses tab
+    
+    const renderExpenseTab = () => {
+       const total = expenses.reduce(
+          (sum , expense) => sum + (expense.price || expense.amount || 0),
+          0
+       );
+
+
+       return (
+          <ScrollView className='px-4 pt-4 bg-white'>
+            <View className="mb-6">
+               <Text className='text-2xl font-extrabold'>Budget</Text>
+               <Text className="text-sm text-gray-500 mb-4">Track your expenses for this trip</Text>
+               <View className='bg-gray-100 p-4 rounded-lg mb-4'>
+                  <Text className='text-lg font-semibold'>Total: ${total.toFixed(2)}</Text>
+               </View>
+               <TouchableOpacity onPress={() => {
+                   setModalMode("expense");
+                   setModalVisible(true);
+               }} className='bg-blue-500 p-3 rounded-lg items-center'>
+                  <Text className="text-white font-medium">Add new Expense</Text>
+               </TouchableOpacity>
+            </View>
+
+            {expenses.map((expense , index) => (
+               <View key={index} className="mb-4 bg-gray-50 rounded-lg p-3 shadow">
+                   <View className="flex-row justify-between">
+                     <View>
+                        <Text className="text-sm font-semibold">
+                         {expense.description}
+                        </Text>
+                        <Text className="text-xs text-gray-500">
+                          {expense.category}
+                        </Text>
+                        <Text className="text-xs text-gray-500">
+                          Paid by:{expense.paidBy}
+                        </Text>
+                        <Text  className="">
+                         Split:{expense.splitOption}
+                        </Text>
+                     </View>
+
+                     <View className="items-end">
+                         <Text className="text-sm font-semibold">
+                           ${(expense.price || expense.amount || 0).toFixed(2)}
+                         </Text>
+                         <Text className="text-xs text-gray-400">
+                       {dayjs(expense.date).format("MMM D, YYYY")}
+                         </Text>
+                     </View>
+                   </View>
+
+
+                   <View className="flex-row justify-end mt-2 space-x-2">
+                     <TouchableOpacity onPress={() => {
+                         setEditingExpense(expense);
+                         setExpenseForm({
+                            description : expense.description,
+                            category : expense.category,
+                            amount : (expense.price || expense.amount || 0).toString(),
+                            paidBy : expense.paidBy,
+                            splitOption : expense.splitOption,
+                         });
+                         setModalMode("editExpense");
+                         setModalVisible(true);
+                     }} className='bg-blue-100 p-2 rounded'>
+                          
+                          <Ionicons name="pencil" size={16} color="2563eb"/>
+                     </TouchableOpacity>
+                     
+                     <TouchableOpacity onPress={() => handleDeleteExpense(expense.id)}
+                      className='bg-red-100 p-2 rounded'>
+                     <Ionicons name="trash" size={16} color="#dc2626"/>
+                     </TouchableOpacity>
+                  </View>
+               </View>
+            ))}
+          </ScrollView>
+       );
+    };
+
+
+
   return (
     <SafeAreaView className="flex-1 bg-white">
        <View className="relative w-full h-48">
@@ -978,7 +1062,7 @@ const PlanTripScreen = () => {
                      };
 
                      if(selectedDate){
-                        await handlePlaceToItinerary(place , selectedDate)
+                        await handleAddPlaceToItinerary(place , selectedDate)
                      } else {
                          await handleAddPlace(data);
                      }
