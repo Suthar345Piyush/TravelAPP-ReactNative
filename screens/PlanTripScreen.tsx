@@ -1,4 +1,4 @@
-import { Image,  ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ActivityIndicator, Image,  ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useNavigation } from '@react-navigation/native';
 import { RouteProp, useFocusEffect, useRoute } from '@react-navigation/native';
@@ -641,6 +641,107 @@ const PlanTripScreen = () => {
           </View>
         ));
    };
+
+
+   // function for rendering the itinerary tab 
+
+   const renderItineraryTab = () => {
+
+      // calling the trip dates function 
+
+       const dates = generateTripDates();
+
+       return (
+         <ScrollView className="px-4 pt-4 bg-white">
+            <TouchableOpacity 
+              onPress={fetchAIPlaces}
+               disabled={aiLoading}
+              className="bg-blue-500 p-3 rounded-lg mb-4 items-center">
+               <View className="flex-row items-center">
+                   {
+                      aiLoading ? (
+                         <ActivityIndicator size="small" color="#fff"/>
+                      ) : ( 
+                        <MaterialIcons name="auto-awesome" size={20} color="#fff"/>
+                      )
+                   }
+                   <Text className="text-white font-medium ml-2">
+                      {aiLoading ? "Fetching ai Response..." : "Use AI to create itinerary"}
+                   </Text>
+               </View>
+            </TouchableOpacity>
+
+            <View className="flex-row mb-4">
+               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {dates.map((date , index) => (
+                    <TouchableOpacity key={index} onPress={() => setSelectedDate(date.value)}
+                     className={`px-4 py-2 mr-2 rounded-lg ${
+                         selectedDate === date.value ? "bg-blue-500" : "bg-gray-100"
+                     }`}
+                    >
+
+                     <Text className={`font-semibold text-sm ${
+                         selectedDate === date.value ? "text-white" : "text-gray-700"
+                     }`}>
+                        {date.label}
+                     </Text>
+                    </TouchableOpacity>
+                  ))}
+               </ScrollView>
+            </View>
+
+      
+   // using the optional chaining  and providing the fallback 
+
+            {dates.map((date , index) => {
+                const itineraryForDate = (trip.itinerary || []).find(
+                  (item : any) => item.date === date.value
+                ) || {};
+
+                const activities = itineraryForDate?.activities || [];
+
+                return (
+                 <View className="mb-8" key={index}>
+                   <View className="flex-row items-center mb-2">
+                     <Text className='text-2xl font-semibold mr-2'>
+                          {date.label}
+                     </Text>
+                     <Text className="text-gray-400 font-medium">
+                        Add Subheading
+                     </Text>
+                   </View>
+
+
+                   <View>
+                     
+                   </View>
+                 </View>  
+                )
+
+
+
+
+            })}
+
+           
+          
+           
+
+
+
+
+
+
+
+
+         
+           
+
+
+         </ScrollView> 
+       )
+
+   }
 
 
 
