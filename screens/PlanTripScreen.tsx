@@ -690,7 +690,6 @@ const PlanTripScreen = () => {
                </ScrollView>
             </View>
 
-      
    // using the optional chaining  and providing the fallback 
 
             {dates.map((date , index) => {
@@ -712,40 +711,42 @@ const PlanTripScreen = () => {
                    </View>
 
 
-                   <View>
-                     
+                   <View className="flex-row items-center space-x-2 mb-2">
+                      <Text className="text-blue-600 text-sm font-semibold">
+                          ✈ Auto-fill day
+                      </Text>
+                      <Text className="text-blue-600 text-sm font-semibold">
+                         · 🗺 Optimize route
+                      </Text>
+                      <Text className="text-xs bg-orange-400 text-white px-1.5 py-1.5 rounded">
+                        PRO
+                      </Text>
                    </View>
+
+                   {activities.length > 0 ?  (
+                      activities.map((place : any , idx : number) => 
+                       renderPlaceCard(place , idx , true)
+                      ) 
+                   ) : (
+                       <Text className="text-sm text-gray-500 mb-3">
+                         No activities added for this date
+                       </Text>
+                   )}
+
+                   <TouchableOpacity onPress={() => {
+                      setSelectedDate(date.value);
+                      setModalMode("place");
+                      setModalVisible(true);
+                   }} className='flex-row items-center bg-gray-100 rounded-lg px-4 py-3 mb-3'> 
+                       <Ionicons name="location-outline" size={16} color="#777"/>
+                       <Text className="ml-2 text-gray-500">Add a place</Text>
+                   </TouchableOpacity>
                  </View>  
-                )
-
-
-
-
+                );
             })}
-
-           
-          
-           
-
-
-
-
-
-
-
-
-         
-           
-
-
          </ScrollView> 
-       )
-
-   }
-
-
-
-
+       );
+   };
 
   return (
     <SafeAreaView className="flex-1 bg-white">
