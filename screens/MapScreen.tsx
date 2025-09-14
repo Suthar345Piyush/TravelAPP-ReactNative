@@ -7,7 +7,7 @@ import {
 import MapView , {Marker , Region} from "react-native-maps";
 import { useRoute } from "@react-navigation/native";
 import type { RouteProp } from "@react-navigation/native";
-import { FlatRecord } from "mongoose";
+
 
 
 const {width} = Dimensions.get("window");
