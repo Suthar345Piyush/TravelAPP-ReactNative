@@ -831,7 +831,12 @@ const PlanTripScreen = () => {
     };
 
 
+    // function for places with details  
 
+    const placesWithDetails = await Promise
+
+
+;
   return (
     <SafeAreaView className="flex-1 bg-white">
        <View className="relative w-full h-48">
