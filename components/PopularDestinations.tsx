@@ -38,7 +38,6 @@ const PopularDestinations = () => {
              <View key={index} className="mr-4 relative">
               <Image source={{uri : place.image}}
                className="w-40 h-52 rounded-2xl" resizeMode='cover'/>
-
                <View className="absolute bottom-0 left-0 right-0 h-14 rounded-b-2xl justify-center items-center">
                  <Text className="text-white font-bold text-xl">{place.name}</Text>
                </View>
