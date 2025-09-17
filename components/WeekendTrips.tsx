@@ -48,8 +48,8 @@ const WeekendTrips = () => {
           ))}
       </ScrollView>
     </View>
-  )
-}
+  );
+};
 
 export default WeekendTrips;
 
