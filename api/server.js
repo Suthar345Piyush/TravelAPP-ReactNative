@@ -73,7 +73,7 @@ app.post("/api/trips" , async(req , res) => {
 
 
        if(!clerkUserId){
-          return res.status(401).json({error : "User id is req"});
+          return res.status(401).json({error : "User id is required"});
        };
 
        if(!tripName || !startDate || !endDate || !startDay || !endDay || !background){
@@ -120,7 +120,7 @@ app.get("/" , async(req , res) => {
         const {clerkUserId , email} = req.query;
 
         if(!clerkUserId){
-          return res.status(401).json({error : "User id is req"});
+          return res.status(401).json({error : "User id is required"});
         };
 
         let user = await User.findOne({clerkUserId});

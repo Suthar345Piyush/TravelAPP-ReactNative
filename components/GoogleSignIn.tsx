@@ -5,8 +5,6 @@ import * as AuthSession from "expo-auth-session";
 import {View , Text , TouchableOpacity , Image , ActivityIndicator} from "react-native";
 import React , {useCallback , useEffect , useState} from "react";
 
-
-
 export const useWarmUpBrowser = () => {
     useEffect(() => {
         void WebBrowser.warmUpAsync();
@@ -20,7 +18,6 @@ export const useWarmUpBrowser = () => {
 // handle any pending authentication session 
 
 WebBrowser.maybeCompleteAuthSession();
-
 
 
 export default function GoogleSignIn() {
