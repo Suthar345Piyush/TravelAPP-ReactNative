@@ -1,16 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeStack from './HomeStack';
 import {Ionicons} from "@expo/vector-icons";
 import GuideStack from './GuideStack';
 import ProfileScreen from '../screens/ProfileScreen';
+import HomeScreen from '../screens/HomeScreen';
+import TripScreen from '../screens/TripScreen';
+import GuideScreen from '../screens/GuideScreen';
+import {View , Text} from "react-native";
 
 
+
+const Tab = createBottomTabNavigator();
 
 
 const TabNavigator = () => {
-   const Tab = createBottomTabNavigator();
+   
 
   return (
      <Tab.Navigator screenOptions={{
@@ -40,8 +44,7 @@ const TabNavigator = () => {
        }}/>
      </Tab.Navigator>
   )
-}
+};
 
-export default TabNavigator
+export default TabNavigator;
 
-const styles = StyleSheet.create({})
