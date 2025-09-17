@@ -73,16 +73,18 @@ const FeaturedGuides = () => {
                 className="w-8 h-8 rounded-full mr-2"/>
                 <View className="flex-1">
                     <Text className="text-sm font-medium text-gray-800">{guide.user.name}</Text>
-                    <Text className="text-[11px] text-gray-500">{guide.user.views} views</Text>
+                    <Text className="text-[11px] text-gray-500">{guide.user.views}</Text>
                 </View>
              </View>
            </View>
            </View>
-         ))}         
+
+         ))}
+         
       </ScrollView>
     </View>
   )
-};
+}
 
 export default FeaturedGuides;
 

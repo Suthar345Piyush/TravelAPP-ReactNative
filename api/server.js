@@ -11,7 +11,7 @@ const port = process.env.PORT || 3000;
 
 import Trip from "./models/trip.js";
 import User from "./models/user.js";
-
+import { deepOrange } from "@mui/material/colors";
 
 
 
@@ -44,6 +44,11 @@ const transporter = nodemailer.createTransport({
 });
 
 
+
+
+
+
+
 app.get("/" , (req , res) => { 
    res.send("Trip Planner API");
 });
@@ -68,7 +73,7 @@ app.post("/api/trips" , async(req , res) => {
 
 
        if(!clerkUserId){
-          return res.status(401).json({error : "User id is required"});
+          return res.status(401).json({error : "User id is req"});
        };
 
        if(!tripName || !startDate || !endDate || !startDay || !endDay || !background){
@@ -115,7 +120,7 @@ app.get("/" , async(req , res) => {
         const {clerkUserId , email} = req.query;
 
         if(!clerkUserId){
-          return res.status(401).json({error : "User id is required"});
+          return res.status(401).json({error : "User id is req"});
         };
 
         let user = await User.findOne({clerkUserId});
@@ -178,11 +183,13 @@ app.post("/api/trips/:tripId/places" , async (req , res) => {
            return res.status(400).json({error : "Place Id is required"});
        }
 
+
        const trip = await Trip.findById(tripId);
 
        if(!trip){
           return res.status(404).json({error : "Trip not found"});
        }
+
 
        const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${API_KEY}`;
 

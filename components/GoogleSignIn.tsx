@@ -6,6 +6,7 @@ import {View , Text , TouchableOpacity , Image , ActivityIndicator} from "react-
 import React , {useCallback , useEffect , useState} from "react";
 
 
+
 export const useWarmUpBrowser = () => {
     useEffect(() => {
         void WebBrowser.warmUpAsync();
@@ -20,6 +21,8 @@ export const useWarmUpBrowser = () => {
 
 WebBrowser.maybeCompleteAuthSession();
 
+
+
 export default function GoogleSignIn() {
      useWarmUpBrowser();
 
@@ -27,6 +30,7 @@ export default function GoogleSignIn() {
    const [loading  , setLoading] = useState(false);
    const [error , setError] = useState("");
 
+   
 
    const onGoogleSignInPress = useCallback(async () => {
       setLoading(true);
@@ -69,4 +73,4 @@ export default function GoogleSignIn() {
          </TouchableOpacity>
       </View>
    );
-};
+}
