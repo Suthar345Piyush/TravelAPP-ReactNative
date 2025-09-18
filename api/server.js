@@ -5,13 +5,11 @@ import cors from "cors";
 import axios from "axios";
 
 
-
 const app = express();
 const port = process.env.PORT || 3000;
 
 import Trip from "./models/trip.js";
 import User from "./models/user.js";
-
 
 
 app.use(cors());
@@ -26,12 +24,6 @@ mongoose.connect(mongoUri).then(() => {
 });
 
 
-
-app.listen(port , () => {
-   console.log("Server is running at port 3000");
-});
-
-
 // node mailer setup in the server.js file  
 
 const transporter = nodemailer.createTransport({
@@ -41,11 +33,6 @@ const transporter = nodemailer.createTransport({
        pass : "",
     },
 });
-
-
-
-
-
 
 
 app.get("/" , (req , res) => { 
@@ -113,7 +100,7 @@ app.post("/api/trips" , async(req , res) => {
     }
 });
 
-// get trips for current user endpoints 
+//  endpoint to get the trips 
 
 app.get('/api/trips' , async(req , res) => {
     try {
@@ -141,18 +128,33 @@ app.get('/api/trips' , async(req , res) => {
     }
 });
 
-// get request for single trip endpoint 
+//  endpoint for getting a single trip 
 
-app.get('/api/trips/:trips' , async(req , res) => {
-    try {
-       
-    } catch(error){
-       
-    }
-})
+app.get('/api/trips/:tripId' , async(req , res) => {
+     try {
+       const {tripId} = req.params;
+       const {clerkUserId} = req.query;
 
+       if(!clerkUserId) {
+          return res.status(401).json({error : 'User Id is required'});
+       }
 
+       const user = await User.findOne({clerkUserId});
+       if(!user){
+          return res.status(404).json({error : "User not found"});
+       }
 
+       const trip = await Trip.findById(tripId).populate('host travelers');
+       if(!trip){
+          return res.status(404).json({error : 'Trip not found'});
+       }
+
+       res.status(200).json({trip});
+     } catch(error){
+       console.error('Error fetching trip:' , error);
+       res.status(500).json({error : 'Failed to fetch trip'});
+     }
+});
 
 
 
@@ -177,9 +179,7 @@ app.get("/" , async(req , res) => {
           $or : [{host : user._id },{travelers:user._id}],
         }).populate("host travelers")
 
-
         res.status(200).json({trips});  
-
 
     } catch(error){
         console.log("Error" , error);
@@ -188,6 +188,7 @@ app.get("/" , async(req , res) => {
 });
 
 
+// endpoint for sending emails 
 
 app.post("/api/send-email" , async(req , res) => {
     try{
@@ -213,6 +214,9 @@ app.post("/api/send-email" , async(req , res) => {
     }
 });
 
+
+
+// add place to the trips endpoint
 
 
 app.post("/api/trips/:tripId/places" , async (req , res) => {
@@ -276,11 +280,10 @@ app.post("/api/trips/:tripId/places" , async (req , res) => {
                    southwest : {
                       lat : details.geometry?.viewport?.southwest?.lat || 0,
                       lng : details.geometry?.viewport?.southwest?.lng || 0,
-                   }
-                }
-             }
+                   },
+                },
+             },
        };
-
 
        const updatedTrip = await Trip.findByIdAndUpdate(
          tripId,
@@ -297,6 +300,156 @@ app.post("/api/trips/:tripId/places" , async (req , res) => {
 });
 
 
+
+// add place to itinerary endpoint 
+
+app.post('/api/trips/:tripId/itinerary' , async(req , res) => {
+    try {
+       const {tripId} = req.params;
+       const {placeId , date , placeData} = req.body;
+       const API_KEY = 'abc';
+       
+       if(!date){
+          return res.status(400).json({error : 'Date is required'});
+       }
+
+       if(!placeId && !placeData){
+          return res.status(400).json({error : "Either placeId or placeData is required"});
+       }
+
+       const trip = await Trip.findById(tripId);
+       if(!trip){
+          return res.status(400).json({error : 'Trip not found'});
+       }
+
+       let activityData;
+
+       if(placeData){
+          activityData = {
+             date, 
+             name : placeData.name || "Unknown Place",
+             phoneNumber : placeData.phoneNumber || '',
+             website : placeData.website || '',
+             openingHours : placeData.openingHours || [],
+             photos : placeData.photos || [],
+             reviews : placeData.reviews || [],
+             types : placeData.types || [],
+             formatted_address : placeData.formatted_address || "No address available",
+             briefDescription : placeData.briefDescription || "No description provided",
+             geometry : placeData.geometry || {
+                location : {lat : 0 , lng : 0},
+                viewport : {
+                   northeast : {lat : 0 , lng : 0},
+                   southwest : {lat : 0 , lng : 0},
+                },
+             },             
+          };
+       } else {
+          const  url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${API_KEY}`;
+
+          const response = await axios.get(url);
+          const {status , result : details} = response.data;
+
+          if(status !== 'OK' || !details){
+             return res.status(400).json({error : `Google Places API error: ${status}`});
+          }
+
+          activityData = {
+             date,
+             name : details.name || "Unknown Place",
+             phoneNumber : details.formatted_phone_number || "",
+             website : details.website || "",
+             openingHours : details.opening_hour?.weekday_text || [],
+             photos : details.photos?.map(
+               photo => `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${photo.photo_reference}&key=${API_KEY}`
+             ) || [],
+
+             reviews : details.reviews?.map(review => ({
+                authorName : review.author_name || "Unknown",
+                rating : review.rating || 0,
+                text : review.text || '',
+            })) || [],
+            types : details.types || [],
+            formatted_address : details.formatted_address || "No address available",
+            briefDescription : 
+              details?.editorial_summary?.overview?.slice(0 , 200) + "..." || 
+              details?.reviews?.[0]?.text?.slice(0,200) + "..." || 
+              `Located in ${details.address_components?.[2]?.long_name || details.formatted_address || "this area"}. A nice place to visit.`,
+              geometry : {
+                location : {
+                   lat : details.geometry?.location?.lat || 0,
+                   lng : details.geometry?.location?.lng || 0,
+                },
+                viewport : {
+                   northeast : {
+                      lat : details.geometry?.viewport?.northeast?.lat || 0,
+                      lng : details.geometry?.viewport?.northeast?.lng || 0,
+                   },
+                   southwest : {
+                      lat : details.geometry?.viewport?.southwest?.lat || 0,
+                      lng : details.geometry?.viewport?.southwest?.lng || 0,
+                   },
+                },
+              },
+          };
+       } 
+
+
+       const existingItinerary = trip.itinerary.find(item => item.date === date);
+       let updatedTrip;
+       if(existingItinerary){
+          updatedTrip = await Trip.findByIdAndUpdate(
+            tripId,
+            {$push : {'itinerary.$[elem].activities':activityData}},
+            {arrayFilters : [{'elem.date' : date}] , new : true}
+          );
+       } else {
+          updatedTrip = await Trip.findByIdAndUpdate(
+             tripId,
+             {$push : {itinerary : {date , activities : [activityData]}}},
+             {new : true}
+          );
+       }
+
+       res.status(200).json({message : "Acitivity added to itinerary successfully" , trip:updatedTrip});
+
+    } catch(error){
+      console.error("Error adding activity to itinerary: " , error);
+      res.status(500).json({error : "Failed to add activity to itinerary"});       
+    }
+});
+
+
+
+// send email api endpoint 
+
+app.post('/api/send-email' , async(req , res) => {
+    try{
+      const {email , subject , message} = req.body;
+
+      if(!email || !subject || !message){
+          return res.status(400).json({error : 'Email , subject and message are required'});
+      }
+
+      const mailOptions = {
+          from : 'emailaddress@gmail.com',
+          to : email,
+          subject : subject,
+          text : message,
+      };
+
+      await transporter.sendMail(mailOptions);
+      res.status(200).json({message : "Email sent successfully"});
+    } catch(error){
+       console.error("Error sending email:" , error);
+       res.status(500).json({error : "Failed to send email"});
+    }
+});
+
+
+app.listen(port , () => {
+    console.log(`Server running on port ${port}`)
+});
 
 
 
