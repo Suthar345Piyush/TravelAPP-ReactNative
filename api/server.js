@@ -11,7 +11,6 @@ const port = process.env.PORT || 3000;
 
 import Trip from "./models/trip.js";
 import User from "./models/user.js";
-import { deepOrange } from "@mui/material/colors";
 
 
 
@@ -113,6 +112,48 @@ app.post("/api/trips" , async(req , res) => {
        res.status(500).json({error : "Failed to create trip"});
     }
 });
+
+// get trips for current user endpoints 
+
+app.get('/api/trips' , async(req , res) => {
+    try {
+       const {clerkUserId , email} = req.query;
+       if(!clerkUserId) {
+          return res.status(401).json({error : 'User id is required'});
+       }
+
+       let user = await User.findOne({clerkUserId});
+       if(!user){
+         if(!email){
+             return res.status(400).json({error : 'User email is required'});
+         }
+         user = new User({clerkUserId , email : email.toString() , name : ''});
+         await user.save();
+       }
+
+       const trips = await Trip.find({
+          $or : [{host : user._id} , {travelers : user._id}],
+       }).populate('host travelers');
+       res.status(200).json({trips});
+    } catch(error){
+       console.error("Error fetching trips:" , error);
+       res.status(500).json({error : 'Failed to fetch trips'});
+    }
+});
+
+// get request for single trip endpoint 
+
+app.get('/api/trips/:trips' , async(req , res) => {
+    try {
+       
+    } catch(error){
+       
+    }
+})
+
+
+
+
 
 
 app.get("/" , async(req , res) => {
