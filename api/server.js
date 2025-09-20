@@ -92,10 +92,10 @@ app.post("/api/trips" , async(req , res) => {
        });
 
        await trip.save();
-       res.status(201).json({message : "Trip created successfully!!"});
+       res.status(201).json({message : "Trip created successfully!!" , trip});
 
     } catch(error){
-       console.log("Error" , error);
+       console.log("Error creating trips:" , error);
        res.status(500).json({error : "Failed to create trip"});
     }
 });
@@ -294,7 +294,7 @@ app.post("/api/trips/:tripId/places" , async (req , res) => {
        res.status(200).json({message : "Place added successfully" , trip : updatedTrip});
 
     } catch(error){
-        console.log("Error" , error);
+        console.log("Error adding place to trip:" , error);
         res.status(500).json({error : "Failed to add place to trip"});
     }
 });
