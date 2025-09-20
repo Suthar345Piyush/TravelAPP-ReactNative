@@ -756,7 +756,6 @@ const PlanTripScreen = () => {
           0
        );
 
-
        return (
           <ScrollView className='px-4 pt-4 bg-white'>
             <View className="mb-6">
@@ -831,12 +830,6 @@ const PlanTripScreen = () => {
     };
 
 
-    // function for places with details  
-
-    const placesWithDetails = await Promise
-
-
-;
   return (
     <SafeAreaView className="flex-1 bg-white">
        <View className="relative w-full h-48">
@@ -851,8 +844,8 @@ const PlanTripScreen = () => {
                 <Text className='text-lg font-semibold'>
                    Trip to {trip?.tripName}</Text>
                 <Text className="text-sm text-gray-500 mt-1">
-                   {{trip.startDate ? dayjs(trip.startDate).format("MM D") : "N/A"}}
-                   {{trip.endDate ? dayjs(trip.endDate).format("MM D") : "N/A"}}
+                   {trip?.startDate ? dayjs(trip.startDate).format("MM D") : "N/A"}
+                   {trip?.endDate ? dayjs(trip.endDate).format("MM D") : "N/A"}
                 </Text>
              </View>
 
@@ -1077,7 +1070,7 @@ const PlanTripScreen = () => {
                  }}
                   query={{
                       key : GOOGLE_API_KEY,
-                      language="en",
+                      language:"en",
                       }}
                       
                       styles={{
